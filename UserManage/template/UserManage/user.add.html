@@ -1,0 +1,39 @@
+{% extends "../base.html" %}
+
+{% block title %}
+    Add User
+{% end%}
+
+{% block content %}
+    <div class="btn-toolbar">
+        <div class="btn-group">
+
+            <a class="btn btn-default " href=theadduserurl><span class="glyphicon glyphicon-edit"></span>新建用户</a>
+
+            <a class="btn btn-default"><span class="glyphicon glyphicon-list"></span>用户列表</a>
+        </div>
+    </div>
+
+    <hr/>
+    <form class="form-horizontal" role="form" action=# method="POST" >
+
+            <div class="form-group">
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+                <label class="control-label">用户名</label> <input type="text" name="username"><br>
+            </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-1 col-md-10">
+                <button type="submit" class="btn btn-danger btn-sm">新 增</button>
+            <div>
+        </div>
+    </form>
+{% end %}

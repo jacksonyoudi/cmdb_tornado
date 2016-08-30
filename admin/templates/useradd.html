@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block extralink %}
+<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+<link rel="stylesheet" type="text/css" href="/static/css/forms.css">
+<link rel="stylesheet" type="text/css" href="/static/css/ie.css" >
+<script type="text/javascript" src="/static/js/core.js"></script>
+<script type="text/javascript" src="/static/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/js/actions.js"></script>
+
+
+
+<meta name="robots" content="NONE,NOARCHIVE">
+<style id="style-1-cropbar-clipper">/* Copyright 2014 Evernote Corporation. All rights reserved. */
+.en-markup-crop-options {
+    top: 18px !important;
+    left: 50% !important;
+    margin-left: -100px !important;
+    width: 200px !important;
+    border: 2px rgba(255,255,255,.38) solid !important;
+    border-radius: 4px !important;
+}
+
+.en-markup-crop-options div div:first-of-type {
+    margin-left: 0px !important;
+}
+</style>
+{% end %}
+
+{% block body %} <body style='background-color:#fcfcfc;' class="auth-user change-form"  > {% end %}
+
+
+
+{% block context %}
+
+<div class="breadcrumbs">
+<a href="/">首页</a>
+› <a href="/user/">User</a>
+› <a href="/user/">用户</a>
+› 增加 用户
+</div>
+        {% if useranother %}
+        <ul class="messagelist">
+          <li class="info">用户 "{{ useranother }}" 添加成功。 你可以在下面增加另一个 用户 。</li>
+        </ul>
+        {% end %}
+
+<!-- Container -->
+<div id="container">
+
+
+    <!-- Content -->
+    <div id="content" class="colM">
+
+        <h3>增加 用户</h3>
+        <div id="content-main">
+
+
+
+<form enctype="multipart/form-data" action="/useradd/" method="post" id="user_form"><div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="E2Puwuz5Sr9wdFVOlwlv4LNI5jirPfCF"></div>
+
+    <p>首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。</p>
+
+
+<div>
+
+    {% if passworderr %}
+        <p class="errornote">
+    请修正下面的错误。
+    </p>
+
+    {%  end  %}
+
+
+
+
+
+
+  <fieldset class="module aligned wide">
+
+
+
+        <div class="form-row field-username">
+
+
+                <div>
+
+
+                        <label for="id_username" class="required">用户名:</label>
+
+                            <input id="id_username" type="text" name="username" maxlength="30" value={{ username }}>
+
+
+
+                        <p class="help">必填。不多于30个字符。只能用字母、数字和字符 @/./+/-/_ 。</p>
+
+                </div>
+
+        </div>
+
+        <div class="form-row field-password1">
+
+
+                <div>
+
+
+                        <label for="id_password1" class="required">密码:</label>
+
+                            <input type="password" name="password1" id="id_password1">
+
+
+
+                </div>
+
+        </div>
+
+        <div class="form-row field-password2">
+
+            {% if passworderr %}
+            <ul class="errorlist"><li>两个密码字段不一致。</li></ul>
+            {% end %}
+
+                <div>
+
+
+                        <label for="id_password2" class="required">密码确认:</label>
+
+                            <input type="password" name="password2" id="id_password2">
+
+
+
+                        <p class="help">为了校验，输入与上面相同的密码。</p>
+
+                </div>
+
+        </div>
+
+</fieldset>
+
+
+
+
+
+<script type="text/javascript">document.getElementById("id_username").focus();</script>
+
+<div class="submit-row">
+<input type="submit" value="保存" class="default" name="_save">
+
+
+<input type="submit" value="保存并增加另一个" name="_addanother">
+<input type="submit" value="保存并继续编辑" name="_continue">
+</div>
+
+
+
+   <script type="text/javascript">document.getElementById("id_username").focus();</script>
+
+
+
+<script type="text/javascript">
+(function($) {
+    var field;
+
+
+})(django.jQuery);
+</script>
+
+
+</div>
+</form></div>
+
+
+        <br class="clear">
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+
+{%  end %}

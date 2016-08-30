@@ -217,7 +217,32 @@ class TableHandler(tornado.web.RequestHandler):
 
 class InformationHandler(tornado.web.RequestHandler):
     def get(self):
-        
+        name = project_info()
+        projectid = 1000330
+        projectname = name
+        project_name = name[projectid]
+        self.render('information.html', projectname=projectname, program=project_name, projectid=projectid)
+
+    def post(self):
+        name = project_info()
+        projectid = self.get_argument('three')
+        projectid = int(projectid)
+        projectname = name
+        project_name = name[projectid]
+        self.render('information.html', projectname=projectname, program=project_name, projectid=projectid)
+
+
+# class UserHandler(tornado.web.RequestHandler):
+#     def get(self):
+#         name = project_info()
+#         one = '2016-01-01'
+#         two = '2016-09-01'
+#         projectid = 1000330
+#         groupname = projectid
+#         data = project_cost(one, two, projectid)
+#
+#         self.render('program.html', cost=data, username=username, program=group, one=one, two=two,
+#                     projectname=projectname, groupname=groupname, projectid=projectid)
 
 
 class Application(tornado.web.Application):
@@ -227,6 +252,7 @@ class Application(tornado.web.Application):
             (r"/update/", AllHandler),
             (r"/line/", LineHandler),
             (r"/table/", TableHandler),
+            (r"/information/", InformationHandler),
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "template"),

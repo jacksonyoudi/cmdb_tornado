@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block extralink %}
+<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+<link rel="stylesheet" type="text/css" href="/static/css/forms.css">
+<link rel="stylesheet" type="text/css" href="/static/css/ie.css" >
+<link rel="stylesheet" type="text/css" href="/static/css/changelists.css" >
+<script type="text/javascript" src="/static/js/core.js"></script>
+<script type="text/javascript" src="/static/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/js/actions.js"></script>
+
+
+
+<script type="text/javascript">
+(function($) {
+    $(document).ready(function($) {
+        $("tr input.action-select").actions();
+    });
+})(django.jQuery);
+</script>
+{% end %}
+
+{% block body %} <body style='background-color:#fcfcfc;' class="change-list"  > {% end %}
+
+
+{% block context %}
+
+<div class="breadcrumbs">
+<a href="/">首页</a>
+› <a href="/group/">group</a>
+› 组
+</div>
+
+    {% if one %}
+        <ul class="messagelist">
+          <li class="info">成功删除了 {{one}} 个 组</li>
+        </ul>
+   {% end %}
+
+    {% if group_name %}
+        <ul class="messagelist">
+          <li class="info">组  {{ group_name}}  添加成功。</li>
+        </ul>
+    {% end %}
+
+    <!-- Content -->
+    <div id="content" class="flex">
+
+        <h3>选择 组 来修改</h3>
+
+  <div id="content-main">
+
+
+        <ul class="object-tools">
+
+            <li>
+              <a href="/groupadd/" class="addlink">
+                增加 组
+              </a>
+            </li>
+
+        </ul>
+
+
+
+    <div class="module" id="changelist">
+
+
+<div id="toolbar"><form id="changelist-search" action="/group/" method="get">
+<div><!-- DIV needed for valid HTML -->
+<label for="searchbar"><img src="/static/img/icon_searchbox.png" alt="Search"></label>
+<input type="text" size="40" name="q" value="" id="searchbar">
+<input type="submit" value="搜索">
+
+
+</div>
+</form></div>
+<script type="text/javascript">document.getElementById("searchbar").focus();</script>
+
+
+
+
+
+
+
+
+
+      <form id="changelist-form" action="/group/" method="post"><div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="E2Puwuz5Sr9wdFVOlwlv4LNI5jirPfCF"></div>
+
+
+
+
+<div class="actions">
+    <label>动作 <select name="action">
+<option value="" selected="selected">---------</option>
+<option value="delete_selected">删除所选的 组</option>
+</select></label><input type="hidden" class="select-across" value="0" name="select_across">
+    <button type="submit" class="button" title="运行选中的动作" name="index" value="0">执行</button>
+
+        <script type="text/javascript">var _actions_icnt="42";</script>
+        <span class="action-counter" style="display: inline;"> {{ count }}个</span>
+
+
+</div>
+
+
+
+
+<div class="results">
+<table id="result_list">
+<thead>
+<tr>
+
+<th scope="col" class="action-checkbox-column">
+
+   <div class="text"><span><input type="checkbox" id="action-toggle" style="display: inline-block;"></span></div>
+   <div class="clear"></div>
+</th>
+<th scope="col">
+
+   <div class="text"><span>组</span></div>
+   <div class="clear"></div>
+</th>
+</tr>
+</thead>
+<tbody>
+
+{% for i in groupdict %}
+
+{% if i.id % 2 == 1 %}
+<tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }} name="_selected_action"></td><th><a href="/groupdetail/{{ i.id }}">{{ i.name }}</a></th></tr>
+
+{% else %}
+<tr class="row2"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }} name="_selected_action"></td><th><a href="/groupdetail/{{ i.id }}">{{ i.name }}</a></th></tr>
+{% end %}
+{% end %}
+
+
+</tbody>
+</table>
+</div>
+
+
+
+
+
+
+<p class="paginator">
+
+{{ count }} 组
+
+
+</p>
+
+      </form>
+    </div>
+  </div>
+
+
+        <br class="clear">
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+
+
+{% end %}
