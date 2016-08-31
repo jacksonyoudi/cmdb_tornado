@@ -19,11 +19,12 @@
 <h3 class="panel-title"><span><img src="/static/img/logo.png" alt="logo"></span>
     <div class="btn-group pull-right" style="background-color: aliceblue">
                 <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">username</span>
+                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">{{user_basename}}</span>
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="/login/">Logout</a></li>
+                    <li><a href="/logout/">Logout</a></li>
+                    <li><a href="/back/">返回成本管理</a></li>
                 </ul>
            </div>
 </h3>

@@ -18,7 +18,7 @@
 <h3 class="panel-title"><span><img src="/static/img/logo.png" alt="logo"></span>
     <div class="btn-group pull-right" style="background-color: aliceblue">
                 <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">{{ username }}</span>
+                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">{{ user_basename }}</span>
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
@@ -44,10 +44,44 @@
                     <div class="panel panel-primary leftMenu">
                         <div class="panel-heading">
                             <ul class="nav nav-pills nav-stacked">
-                            <li class="active"><a href="/showall/"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;游戏项目费用总览</a></li>
+                            <li class="active"><a href="/showall/"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;费用总览</a></li>
                                 </ul>
                         </div>
                     </div>
+
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                            <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="/"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;条形图</a></li>
+                                </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                            <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="/line/"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;曲线图</a></li>
+                                </ul>
+                        </div>
+                    </div>
+
+                   <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                            <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="#" onclick="table_method()"><span class="glyphicon glyphicon-th"></span>&nbsp;&nbsp;表格</a></li>
+                                </ul>
+                        </div>
+                    </div>
+
+                   <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                            <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="#" onclick="information_method()"><span class="glyphicon glyphicon-list"></span>&nbsp;&nbsp;项目信息</a></li>
+                                </ul>
+                        </div>
+                    </div>
+
+
 
                     <div class="panel panel-primary leftMenu">
                         <div class="panel-heading">
@@ -60,55 +94,55 @@
                     <div class="panel panel-primary leftMenu">
                         <div class="panel-heading">
                             <ul class="nav nav-pills nav-stacked">
-                            <li class="active"><a href="/admin/"><span class="glyphicon glyphicon-wrench"></span>&nbsp;权限管理</a></li>
+                            <li class="active"><a href="http://139.129.47.28:8080/"><span class="glyphicon glyphicon-wrench"></span>&nbsp;权限管理</a></li>
                                 </ul>
                         </div>
                     </div>
 
 
-                    <div class="panel panel-primary leftMenu">
-                        <div class="panel-heading" id="collapseListGroupHeading2" data-toggle="collapse" data-target="#collapseListGroup2" role="tab" >
-                            <h5 class="panel-title">
-                                &nbsp;&nbsp;
-                                <span class="glyphicon glyphicon-globe"></span>
-                                网络游戏
-                                <span class="glyphicon glyphicon-chevron-down right"></span>
-                            </h5>
-                    </div>
+                    <!--<div class="panel panel-primary leftMenu">-->
+                        <!--<div class="panel-heading" id="collapseListGroupHeading2" data-toggle="collapse" data-target="#collapseListGroup2" role="tab" >-->
+                            <!--<h5 class="panel-title">-->
+                                <!--&nbsp;&nbsp;-->
+                                <!--<span class="glyphicon glyphicon-globe"></span>-->
+                                <!--网络游戏-->
+                                <!--<span class="glyphicon glyphicon-chevron-down right"></span>-->
+                            <!--</h5>-->
+                    <!--</div>-->
 
-                        <div id="collapseListGroup2" class="panel-collapse collapse " role="tabpanel" aria-labelledby="collapseListGroupHeading2">
-                            <ul class="nav nav-pills nav-stacked">
-                                            <li><a href="/ldzw/">乱斗之王</a></li>
-                                            <li><a href="/cqb/">苍穹变</a></li>
-                                            <li><a href="#">水果忍者</a></li>
+                        <!--<div id="collapseListGroup2" class="panel-collapse collapse " role="tabpanel" aria-labelledby="collapseListGroupHeading2">-->
+                            <!--<ul class="nav nav-pills nav-stacked">-->
+                                            <!--<li><a href="/ldzw/">乱斗之王</a></li>-->
+                                            <!--<li><a href="/cqb/">苍穹变</a></li>-->
+                                            <!--<li><a href="#">水果忍者</a></li>-->
 
-                                            <li><a href="#">三剑豪</a></li>
-                                            <li><a href="#">美人计</a></li>
-                                            <li><a href="#">烈焰遮天</a></li>
-                            </ul>
-                        </div>
-                    </div>
+                                            <!--<li><a href="#">三剑豪</a></li>-->
+                                            <!--<li><a href="#">美人计</a></li>-->
+                                            <!--<li><a href="#">烈焰遮天</a></li>-->
+                            <!--</ul>-->
+                        <!--</div>-->
+                    <!--</div>-->
 
-                    <div class="panel panel-primary leftMenu">
-                        <div class="panel-heading" id="collapseListGroupHeading1" data-toggle="collapse" data-target="#collapseListGroup1" role="tab" >
-                            <h5 class="panel-title">
-                                &nbsp;&nbsp;
-                                <span class="glyphicon glyphicon-phone"></span>
-                                单机游戏
-                                <span class="glyphicon glyphicon-chevron-down right"></span>
-                            </h5>
-                        </div>
-                        <div id="collapseListGroup1" class="panel-collapse collapse " role="tabpanel" aria-labelledby="collapseListGroupHeading1">
-                            <ul class="nav nav-pills nav-stacked">
-                                            <li><a href="/tkzz/">坦克之战</a></li>
-                                            <li><a href="#">地铁跑酷</a></li>
-                                            <li><a href="#">国宝三国</a></li>
-                                            <li><a href="#">机械王</a></li>
-                                            <li><a href="#">纪念碑谷</a></li>
-                                            <li><a href="#">HND英雄永不灭</a></li>
-                                            <li><a href="#">快乐点点消</a></li>
-                            </ul>
-                        </div>
+                    <!--<div class="panel panel-primary leftMenu">-->
+                        <!--<div class="panel-heading" id="collapseListGroupHeading1" data-toggle="collapse" data-target="#collapseListGroup1" role="tab" >-->
+                            <!--<h5 class="panel-title">-->
+                                <!--&nbsp;&nbsp;-->
+                                <!--<span class="glyphicon glyphicon-phone"></span>-->
+                                <!--单机游戏-->
+                                <!--<span class="glyphicon glyphicon-chevron-down right"></span>-->
+                            <!--</h5>-->
+                        <!--</div>-->
+                        <!--<div id="collapseListGroup1" class="panel-collapse collapse " role="tabpanel" aria-labelledby="collapseListGroupHeading1">-->
+                            <!--<ul class="nav nav-pills nav-stacked">-->
+                                            <!--<li><a href="/tkzz/">坦克之战</a></li>-->
+                                            <!--<li><a href="#">地铁跑酷</a></li>-->
+                                            <!--<li><a href="#">国宝三国</a></li>-->
+                                            <!--<li><a href="#">机械王</a></li>-->
+                                            <!--<li><a href="#">纪念碑谷</a></li>-->
+                                            <!--<li><a href="#">HND英雄永不灭</a></li>-->
+                                            <!--<li><a href="#">快乐点点消</a></li>-->
+                            <!--</ul>-->
+                        <!--</div>-->
                     </div>
                 </div>
             </div>
@@ -204,6 +238,41 @@ laydate({
 $(function(){
     $("#footerBar").children().css({"width":$(window).width()/5+"px"});
 });
+</script>
+<script>
+    function table_method()
+    {
+          layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '表格',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/table/',
+                shift: 9
+            });
+
+    };
+     function information_method()
+    {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '项目信息',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/information/',
+                shift: 9
+            });
+
+    };
+
 </script>
 </body>
 

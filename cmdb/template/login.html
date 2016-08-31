@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<title>登录页</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="/static/js/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="/static/img/login.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+<link rel="stylesheet" type="text/css" href="/static/css/login.css">
+<link href="/static/css/login2.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <br>
+    <br>
+<h1>CMDB登录<sup>V2016</sup></h1>
+
+<div class="login" style="margin-top:60px;">
+
+<div id="header">
+        <div id="branding">
+
+<h1 id="site-name" style="height: 60px;font-size: 40px; "><img src="/static/img/logo.png" alt="logo"></h1>
+
+        </div>
+
+
+    </div>
+    <!-- END Header -->
+
+
+    <!-- Content -->
+    <div id="content" class="colM">
+
+        {% if error %}
+<p class="errornote">
+    请输入正确的用户名和密码来登陆您的管理账户。请注意用户名和密码均为大小写相关。
+</p>
+        {% end %}
+
+
+        {% if limit %}
+<p class="errornote">
+    对不起，你没有权限登录此管理后台。如欲使用此后台，请联系管理员。
+</p>
+        {% end %}
+
+
+
+
+
+
+
+
+<div id="content-main">
+<form action="/login/" method="post" id="login-form"><div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="yI7khmIG27b3hehzR4H0gRfM2HK4suIE"></div>
+  <div class="form-row">
+
+    <label for="id_username" class="required">用户名：</label> <input id="id_username" type="text" name="username" maxlength="30">
+  </div>
+  <div class="form-row">
+
+    <label for="id_password" class="required">密码：</label> <input type="password" name="password" id="id_password">
+    <input type="hidden" name="this_is_the_login_form" value="1">
+    <input type="hidden" name="next" value="/admin/">
+  </div>
+
+
+  <div class="submit-row">
+    <label>&nbsp;</label><input type="submit" value="登录">
+  </div>
+</form>
+
+<script type="text/javascript">
+document.getElementById('id_username').focus()
+</script>
+</div>
+
+
+        <br class="clear">
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+
+</div>
+</body>
+</html>

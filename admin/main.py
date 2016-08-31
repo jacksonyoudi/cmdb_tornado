@@ -11,6 +11,7 @@ from MySQLdb.constants import FIELD_TYPE
 import json
 import sys
 import torndb
+import tornado.httpserver
 
 from tornado.options import define, options
 import session
@@ -35,12 +36,16 @@ class Application(tornado.web.Application):
             (r"/userdelete/", UserdeleteHandler),
             (r"/groupadd/", GroupaddHandler),
             (r"/login/", LoginHandler),
+            (r"/logout/", LogoutHandler),
+            (r"/back/", BackHandler),
             (r"/groupdetail/([0-9]+)", GroupdetailHandler),
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             debug=True,
+            cookie_secret="bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
+            login_url="/login/",
         )
         tornado.web.Application.__init__(self, handlers, **settings)
         self.db = torndb.Connection(
@@ -86,22 +91,28 @@ class BaseHandler(tornado.web.RequestHandler):
         return self.get_secure_cookie("username")
 
 
-class IndexHandler(tornado.web.RequestHandler):
+class IndexHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
-        self.render('index.html')
+        user_basename = self.current_user
+        self.render('index.html', user_basename=user_basename)
 
 
-class UserHandler(tornado.web.RequestHandler):
+class UserHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        user_basename = self.current_user
         db = self.application.db
         sql = "select * from auth_user;"
         userlist = db.query(sql)
         db.close()
         count = len(userlist)
         one = 0
-        self.render('user.html', userlist=userlist, count=count, one=one)
+        self.render('user.html', userlist=userlist, count=count, one=one, user_basename=user_basename)
 
+    @tornado.web.authenticated
     def post(self):
+        user_basename = self.current_user
         data = self.request.arguments
         print data
         user_delete = data.get('_selected_action')
@@ -117,24 +128,30 @@ class UserHandler(tornado.web.RequestHandler):
         # userlist = db.query(sql)
         # db.close()
         # count = len(userlist)
-        self.render('userdelete.html', users=users)
+        self.render('userdelete.html', users=users, user_basename=user_basename)
 
 
-class UseraddHandler(tornado.web.RequestHandler):
+class UseraddHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        user_basename = self.current_user
         passworderr = 0
         username = ''
         useranother = 0
-        self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother)
+        self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother,
+                    user_basename=user_basename)
 
+    @tornado.web.authenticated
     def post(self):
+        user_basename = self.current_user
         password1 = self.get_argument('password1')
         password2 = self.get_argument('password2')
         username = self.get_argument('username')
         if password1 != password2:
             passworderr = 1
             useranother = 0
-            self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother)
+            self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother,
+                        user_basename=user_basename)
         else:
             print password1
             password = password_md5(password1)
@@ -174,20 +191,24 @@ class UseraddHandler(tornado.web.RequestHandler):
                 password_string = 0
                 useradd_success = username
                 self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
-                            password_string=password_string, useradd_success=useradd_success)
+                            password_string=password_string, useradd_success=useradd_success,
+                            user_basename=user_basename)
 
             if user_addanother:
                 passworderr = 0
                 useranother = username
                 username = ''
-                self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother)
+                self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother,
+                            user_basename=user_basename)
 
             if user_save:
                 self.redirect('/user/')
 
 
-class UserdetailHandler(tornado.web.RequestHandler):
+class UserdetailHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self, id):
+        user_basename = self.current_user
         db = self.application.db
         sql = "select * from auth_user where id = %s;" % id
         userdetail = db.get(sql)
@@ -209,9 +230,11 @@ class UserdetailHandler(tornado.web.RequestHandler):
         password_string = 0
         useradd_success = 0
         self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
-                    password_string=password_string, useradd_success=useradd_success)
+                    password_string=password_string, useradd_success=useradd_success, user_basename=user_basename)
 
+    @tornado.web.authenticated
     def post(self, id):
+        user_basename = self.current_user
         data = self.request.arguments
         print data
         username = data.get('username')
@@ -272,7 +295,10 @@ class UserdetailHandler(tornado.web.RequestHandler):
             for i in group:
                 group_list.append(i['group_id'])
             db.close()
-            self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list)
+            password_string = 0
+            useradd_success = username
+            self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
+                        password_string=password_string, useradd_success=useradd_success, user_basename=user_basename)
 
         if addanother:
             db.close()
@@ -283,8 +309,10 @@ class UserdetailHandler(tornado.web.RequestHandler):
             self.redirect('/user/')
 
 
-class GroupHandler(tornado.web.RequestHandler):
+class GroupHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        user_basename = self.current_user
         db = self.application.db
         sql = "select * from auth_group;"
         groupdict = db.query(sql)
@@ -292,9 +320,12 @@ class GroupHandler(tornado.web.RequestHandler):
         db.close()
         one = 0
         group_name = 0
-        self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name)
+        self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
+                    user_basename=user_basename)
 
+    @tornado.web.authenticated
     def post(self):
+        user_basename = self.current_user
         data = self.request.arguments
         print data
         group_list = data.get('_selected_action')
@@ -306,15 +337,19 @@ class GroupHandler(tornado.web.RequestHandler):
             a = db.get(sql)
             groupdelete.append(a)
         db.close()
-        self.render('groupdelete.html', groupdelete=groupdelete)
+        self.render('groupdelete.html', groupdelete=groupdelete, user_basename=user_basename)
 
 
-class GroupaddHandler(tornado.web.RequestHandler):
+class GroupaddHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        user_basename = self.current_user
         group_addname = 0
-        self.render('groupadd.html', group_addname=group_addname)
+        self.render('groupadd.html', group_addname=group_addname, user_basename=user_basename)
 
+    @tornado.web.authenticated
     def post(self):
+        user_basename = self.current_user
         group_name = self.get_argument('name')
         print group_name
         data = self.request.arguments
@@ -344,22 +379,27 @@ class GroupaddHandler(tornado.web.RequestHandler):
             db.close()
             one = 0
             print group_name
-            self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name)
+            self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
+                        user_basename=user_basename)
 
         if group_continue:
             self.redirect(url)
 
 
-class GroupdetailHandler(tornado.web.RequestHandler):
+class GroupdetailHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self, id):
+        user_basename = self.current_user
         db = self.application.db
         sql = "select * from auth_group where id=%s;" % id
         groupdetail = db.get(sql)
-        self.render('groupdetail.html', groupdetail=groupdetail)
+        self.render('groupdetail.html', groupdetail=groupdetail, user_basename=user_basename)
 
 
-class PasswordHandler(tornado.web.RequestHandler):
+class PasswordHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self, id):
+        user_basename = self.current_user
         db = self.application.db
         sql = 'select * from  auth_user where id=%s;' % id
         data = db.get(sql)
@@ -367,9 +407,11 @@ class PasswordHandler(tornado.web.RequestHandler):
         username = data['username']
         db.close()
         alter_string = ''
-        self.render('password.html', username=username, id=id, alter_string=alter_string)
+        self.render('password.html', username=username, id=id, alter_string=alter_string, user_basename=user_basename)
 
+    @tornado.web.authenticated
     def post(self, id):
+        user_basename = self.current_user
         password1 = self.get_argument('password1')
         password2 = self.get_argument('password2')
         if password1 == password2:
@@ -399,7 +441,7 @@ class PasswordHandler(tornado.web.RequestHandler):
             db.close()
             password_string = 1
             self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
-                        password_string=password_string)
+                        password_string=password_string, user_basename=user_basename)
 
         else:
             alter_string = '两次密码输入不一致，请重新输入'
@@ -409,11 +451,14 @@ class PasswordHandler(tornado.web.RequestHandler):
             print data
             username = data['username']
             db.close()
-            self.render('password.html', username=username, id=id, alter_string=alter_string)
+            self.render('password.html', username=username, id=id, alter_string=alter_string,
+                        user_basename=user_basename)
 
 
-class UserdeleteHandler(tornado.web.RequestHandler):
+class UserdeleteHandler(BaseHandler):
+    @tornado.web.authenticated
     def post(self):
+        user_basename = self.current_user
         data = self.request.arguments
         users = data.get('_selected_action')
         delete_count = len(users)
@@ -429,11 +474,13 @@ class UserdeleteHandler(tornado.web.RequestHandler):
         db.close()
         count = len(userlist)
         one = delete_count
-        self.render('user.html', userlist=userlist, count=count, one=one)
+        self.render('user.html', userlist=userlist, count=count, one=one, user_basename=user_basename)
 
 
-class GroupdeleteHandler(tornado.web.RequestHandler):
+class GroupdeleteHandler(BaseHandler):
+    @tornado.web.authenticated
     def post(self):
+        user_basename = self.current_user
         data = self.request.arguments
         groups = data.get('_selected_action')
         delete_count = len(groups)
@@ -450,10 +497,11 @@ class GroupdeleteHandler(tornado.web.RequestHandler):
         db.close()
         one = delete_count
         group_name = 0
-        self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name)
+        self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
+                    user_basename=user_basename)
 
 
-class LoginHandler(tornado.web.RequestHandler):
+class LoginHandler(BaseHandler):
     def get(self):
         error = 0
         self.render('login.html', error=error, limit=0)
@@ -479,7 +527,7 @@ class LoginHandler(tornado.web.RequestHandler):
                     print is_active
                     print is_staff
                     if is_staff == 1 and is_active == 1:
-
+                        self.set_secure_cookie("username", self.get_argument("username"))
                         self.redirect("/")
                     else:
                         error = 0
@@ -497,6 +545,16 @@ class LoginHandler(tornado.web.RequestHandler):
             error = 1
             self.render("login.html", error=error, limit=0)
 
+
+class LogoutHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.clear_cookie("username")
+        self.redirect('http://139.129.47.28:8090/login/')
+
+class BackHandler(BaseHandler):
+    def get(self):
+        self.redirect("http://139.129.47.28:8090")
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()

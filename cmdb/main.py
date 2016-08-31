@@ -10,10 +10,53 @@ import MySQLdb
 from MySQLdb.constants import FIELD_TYPE
 import json
 import sys
+import tornado.httpserver
+import torndb
 
 from tornado.options import define, options
 
-define("port", default=8000, help="run on the given port", type=int)
+define("port", default=8090, help="run on the given port", type=int)
+define("mysql_host", default="127.0.0.1:3306", help="db host")
+define("mysql_database", default="tornado", help="db name")
+define("mysql_user", default="tornado", help="db user")
+define("mysql_password", default="tornado", help="db password")
+
+
+def check_password(password_string, password):
+    salt = password_string.split('$')[2]
+    string = 'openssl passwd -1 -salt %s   %s' % (salt, password)
+    output = os.popen(string)
+    result = output.read()
+    result = result.replace('\n', '')
+    return result
+
+
+class Application(tornado.web.Application):
+    def __init__(self):
+        handlers = [
+            (r"/", AllHandler),
+            (r"/update/", AllHandler),
+            (r"/line/", LineHandler),
+            (r"/table/", TableHandler),
+            (r"/information/", InformationHandler),
+            (r"/login/", LoginHandler),
+            (r"/logout/", LogoutHandler),
+            (r"/program/", ProgramHandler),
+        ]
+        settings = dict(
+            template_path=os.path.join(os.path.dirname(__file__), "template"),
+            static_path=os.path.join(os.path.dirname(__file__), "static"),
+            debug=True,
+            cookie_secret="bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
+            login_url="/login/",
+        )
+        tornado.web.Application.__init__(self, handlers, **settings)
+        self.db = torndb.Connection(
+            host=options.mysql_host,
+            database=options.mysql_database,
+            user=options.mysql_user,
+            password=options.mysql_password
+        )
 
 
 def mysqlselect(sql):
@@ -115,33 +158,74 @@ def project_costtable(on, tw, projectid):
     return a
 
 
-class IndexHandler(tornado.web.RequestHandler):
+def mysqlgroup(username):
+    try:
+        c = MySQLdb.connect(host='localhost', user='tornado', passwd='tornado', db='tornado', port=3306, charset='utf8')
+        cur = c.cursor()
+        sql = "select  d.name from auth_group as d,(select a.group_id from auth_user_groups as a,(select id from auth_user where username = '%s') as b where a.user_id = b.id) as c where d.id = c.group_id ; " % username
+        cur.execute(sql)
+        t = cur.fetchall()
+        cur.close()
+        c.close()
+        a = []
+        for i in t:
+            a.append(i[0])
+        return a
+    except Exception, e:
+        print e
+
+
+def dictkey(i, d):
+    a = []
+    for j in i:
+        for k, v in d.items():
+            if v == j:
+                a.append(k)
+    return a
+
+
+def filter_grouplist(l, d):
+    a = {}
+    for i in l:
+        a[i] = d[i]
+    return a
+
+
+class BaseHandler(tornado.web.RequestHandler):
+    def get_current_user(self):
+        return self.get_secure_cookie("username")
+
+
+class IndexHandler(BaseHandler):
     def get(self):
         self.render('test.html')
 
 
-class AllHandler(tornado.web.RequestHandler):
+class AllHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        user_basename = self.current_user
         name = project_info()
         end = 1000000
         scale = 100000
-        username = 'root'
         one = '2016-01-01'
         two = '2016-09-01'
-        projectid = '1000330'
+        projectid = '1000363'
         data = project_cost(one, two, projectid)
         t = int(projectid)
         project_name = name[t]
         projectid = t
+        print data
         self.render('all.html', cost=data, projectid=projectid, end=end,
-                    scale=scale, username=username, one=one, two=two, projectname=name,
-                    progname=json.dumps(project_name))
+                    scale=scale, one=one, two=two, projectname=name,
+                    progname=json.dumps(project_name), user_basename=user_basename)
 
+    @tornado.web.authenticated
     def post(self):
+        user_basename = self.current_user
         name = project_info()
         end = 1000000
         scale = 100000
-        username = 'root'
         one = self.get_argument('one')
         two = self.get_argument('two')
         projectid = self.get_argument('three')
@@ -149,59 +233,111 @@ class AllHandler(tornado.web.RequestHandler):
         t = int(projectid)
         project_name = name[t]
         projectid = t
+        print data
         self.render('all.html', cost=data, projectid=projectid, end=end,
-                    scale=scale, username=username, one=one, two=two, projectname=name,
-                    progname=json.dumps(project_name))
+                    scale=scale, one=one, two=two, projectname=name,
+                    progname=json.dumps(project_name), user_basename=user_basename)
 
 
-class LineHandler(tornado.web.RequestHandler):
+class LineHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
         name = project_info()
         one = '2016-01-01'
         two = '2016-09-01'
-        projectid = 1000330
-        project_name = projectid
-        labels, dataline = project_costline(one, two, projectid)
-        projectname = name
+        if is_superuser:
+            projectid = 1000363
+            project_name = projectid
+            projectname = name
+
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectid = id_list[0]
+            projectid = int(projectid)
+            project_name = projectid
+            projectname = filter_grouplist(id_list, name)
         end = 1000000
         scale = 1000000
+        labels, dataline = project_costline(one, two, projectid)
+        self.render('lineall.html',
+                    flow=dataline, labels=labels, end=end,
+                    scale=scale, one=one, two=two, projectname=projectname, program=project_name,
+                    projectid=projectid, user_basename=username)
+
+    @tornado.web.authenticated
+    def post(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
+        name = project_info()
+        one = self.get_argument('one')
+        two = self.get_argument('two')
+        projectid = self.get_argument('three')
+        projectid = int(projectid)
+        project_name = projectid
+        end = 1000000
+        scale = 1000000
+        if is_superuser:
+            projectname = name
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectname = filter_grouplist(id_list, name)
+
+        labels, dataline = project_costline(one, two, projectid)
         self.render('line.html',
                     flow=dataline, labels=labels, end=end,
                     scale=scale, one=one, two=two, projectname=projectname, program=project_name,
                     projectid=projectid)
 
-    def post(self):
-        name = project_info()
-        one = self.get_argument('one')
-        two = self.get_argument('two')
-        projectid = self.get_argument('three')
-        projectid = int(projectid)
-        project_name = projectid
-        labels, dataline = project_costline(one, two, projectid)
-        projectname = name
-        end = 1000000
-        scale = 1000000
-        self.render('line.html',
-                    flow=dataline, labels=labels, end=end,
-                    scale=scale, one=one, two=two, projectname=projectname, program=project_name,
-                    projectid=projectid)
 
-
-class TableHandler(tornado.web.RequestHandler):
+class TableHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
         name = project_info()
         one = '2016-01-01'
         two = '2016-09-01'
-        projectid = 1000330
+        if is_superuser:
+            projectid = 1000363
+            projectname = name
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectid = id_list[0]
+            projectid = int(projectid)
+            projectname = filter_grouplist(id_list, name)
+
         fee = project_costtable(one, two, projectid)
         project_name = name[projectid]
-        projectname = name
-        print fee
+
         self.render('table.html',
                     dat=fee, program=project_name, one=one, two=two, projectid=projectid,
                     projectname=projectname)
 
+    @tornado.web.authenticated
     def post(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
         name = project_info()
         one = self.get_argument('one')
         two = self.get_argument('two')
@@ -209,57 +345,148 @@ class TableHandler(tornado.web.RequestHandler):
         fee = project_costtable(one, two, projectid)
         projectid = int(projectid)
         project_name = name[projectid]
-        projectname = name
+        if is_superuser:
+            projectname = name
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectname = filter_grouplist(id_list, name)
         self.render('table.html',
                     dat=fee, program=project_name, one=one, two=two, projectid=projectid,
                     projectname=projectname)
 
 
-class InformationHandler(tornado.web.RequestHandler):
+class InformationHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
         name = project_info()
-        projectid = 1000330
-        projectname = name
+        if is_superuser:
+            projectid = 1000363
+            projectname = name
+
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectid = int(id_list[0])
+            projectname = filter_grouplist(id_list, name)
+
         project_name = name[projectid]
         self.render('information.html', projectname=projectname, program=project_name, projectid=projectid)
 
+    @tornado.web.authenticated
     def post(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
         name = project_info()
         projectid = self.get_argument('three')
         projectid = int(projectid)
-        projectname = name
+
         project_name = name[projectid]
+        if is_superuser:
+            projectname = name
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectname = filter_grouplist(id_list, name)
         self.render('information.html', projectname=projectname, program=project_name, projectid=projectid)
 
 
-# class UserHandler(tornado.web.RequestHandler):
-#     def get(self):
-#         name = project_info()
-#         one = '2016-01-01'
-#         two = '2016-09-01'
-#         projectid = 1000330
-#         groupname = projectid
-#         data = project_cost(one, two, projectid)
-#
-#         self.render('program.html', cost=data, username=username, program=group, one=one, two=two,
-#                     projectname=projectname, groupname=groupname, projectid=projectid)
+class ProgramHandler(BaseHandler):
+    def get(self):
+        user_basename = self.current_user
+        name = project_info()
+        group = mysqlgroup(user_basename)
+        id_list = dictkey(group, name)
+        projectname = filter_grouplist(id_list, name)
+        one = '2016-01-01'
+        two = '2016-09-01'
+        projectid = id_list[0]
+        projectid = int(projectid)
+        groupname = name[int(projectid)]
+        data = project_cost(one, two, projectid)
+        print data
+        self.render('program.html', cost=data, user_basename=user_basename, program=group, one=one, two=two,
+                    projectname=projectname, groupname=json.dumps(groupname), projectid=projectid)
+
+    def post(self):
+        user_basename = self.current_user
+        name = project_info()
+        group = mysqlgroup(user_basename)
+        id_list = dictkey(group, name)
+        projectname = filter_grouplist(id_list, name)
+        one = self.get_argument('one')
+        two = self.get_argument('two')
+        projectid = self.get_argument('three')
+        projectid = int(projectid)
+        groupname = name[int(projectid)]
+        data = project_cost(one, two, projectid)
+        print data
+        self.render('program.html', cost=data, user_basename=user_basename, program=group, one=one, two=two,
+                    projectname=projectname, groupname=json.dumps(groupname), projectid=projectid)
 
 
-class Application(tornado.web.Application):
-    def __init__(self):
-        handlers = [
-            (r"/", AllHandler),
-            (r"/update/", AllHandler),
-            (r"/line/", LineHandler),
-            (r"/table/", TableHandler),
-            (r"/information/", InformationHandler),
-        ]
-        settings = dict(
-            template_path=os.path.join(os.path.dirname(__file__), "template"),
-            static_path=os.path.join(os.path.dirname(__file__), "static"),
-            debug=True,
-        )
-        tornado.web.Application.__init__(self, handlers, **settings)
+class LoginHandler(BaseHandler):
+    def get(self):
+        error = 0
+        self.render('login.html', error=error, limit=0)
+
+    def post(self):
+        data = self.request.arguments
+        username = data.get('username')
+        password = data.get('password')
+        if username and password:
+            username = self.get_argument('username')
+            password = self.get_argument('password')
+            db = self.application.db
+            sql = "select * from auth_user where username = '%s';" % username
+            userdata = db.get(sql)
+            db.close()
+            if userdata:
+                password_db = userdata['password']
+                password_input = check_password(password_db, password)
+
+                if password_input == password_db:
+                    is_active = userdata.get('is_active')
+                    is_superuser = userdata.get('is_superuser')
+                    print is_active
+                    if is_active == 1:
+                        self.set_secure_cookie("username", self.get_argument("username"))
+                        if is_superuser:
+                            self.redirect("/")
+                        else:
+                            self.redirect("/program/")
+                    else:
+                        error = 0
+                        limit = 1
+                        self.render("login.html", error=error, limit=limit)
+                else:
+                    error = 1
+                    limit = 0
+                    self.render("login.html", error=error, limit=limit)
+
+            else:
+                error = 1
+                self.render("login.html", error=error, limit=0)
+        else:
+            error = 1
+            self.render("login.html", error=error, limit=0)
+
+
+class LogoutHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.clear_cookie("username")
+        self.redirect('/login/')
 
 
 if __name__ == "__main__":
