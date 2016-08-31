@@ -7,7 +7,7 @@
 			var flow= {{ flow}};
             var end={{ end }};
             var scale = {{ scale }};
-			var text = {{ program}};
+			var text = "{{ program}}";
 
 			var data = [
 			         	{
@@ -47,8 +47,8 @@
 					padding:'0 28',
 					color:'#000000'
 				},
-				width : 700,
-				height : 500,
+				width : 1000,
+				height : 600,
 				shadow:false,
 				shadow_color : '#202020',
 				shadow_blur : 8,
@@ -86,20 +86,21 @@
 					point_size:8
 				},
 				coordinate:{
-					width:550,
-					height:360,
-					striped_factor : 0.18,
-					grid_color:'#ffffff',
+					width:800,
+					height:500,
+					striped_factor : 0.08,
+					grid_color:'#d8d8d8',
+					grid_line_width:0.8,
 					axis:{
-						color:'#9d987a',
-						width:[0,0,4,4]
+						color:'#c0d0e0',
+						width:[0,0,1,0]
 					},
 					scale:[{
 						 position:'left',
 						 start_scale:0,
-						 end_scale: end,
-						 scale_space: scale,
-						 scale_size:2,
+//						 end_scale: end,
+//						 scale_space: scale,
+						 scale_size:0.8,
 						 scale_enable : true,
 						 label : {color:'#000000',font : '微软雅黑',fontsize:6 ,fontweight:400},
 						 scale_color:'#000000'

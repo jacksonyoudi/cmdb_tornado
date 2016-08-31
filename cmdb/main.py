@@ -12,6 +12,8 @@ import json
 import sys
 import tornado.httpserver
 import torndb
+import sys
+
 
 from tornado.options import define, options
 
@@ -21,6 +23,9 @@ define("mysql_database", default="tornado", help="db name")
 define("mysql_user", default="tornado", help="db user")
 define("mysql_password", default="tornado", help="db password")
 
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def check_password(password_string, password):
     salt = password_string.split('$')[2]
@@ -37,6 +42,7 @@ class Application(tornado.web.Application):
             (r"/", AllHandler),
             (r"/update/", AllHandler),
             (r"/line/", LineHandler),
+            (r"/lineprogram/", LineprogramHandler),
             (r"/table/", TableHandler),
             (r"/information/", InformationHandler),
             (r"/login/", LoginHandler),
@@ -218,7 +224,7 @@ class AllHandler(BaseHandler):
         print data
         self.render('all.html', cost=data, projectid=projectid, end=end,
                     scale=scale, one=one, two=two, projectname=name,
-                    progname=json.dumps(project_name), user_basename=user_basename)
+                    progname=project_name, user_basename=user_basename)
 
     @tornado.web.authenticated
     def post(self):
@@ -234,12 +240,75 @@ class AllHandler(BaseHandler):
         project_name = name[t]
         projectid = t
         print data
+        print project_name
         self.render('all.html', cost=data, projectid=projectid, end=end,
                     scale=scale, one=one, two=two, projectname=name,
-                    progname=json.dumps(project_name), user_basename=user_basename)
+                    progname=project_name, user_basename=user_basename)
 
 
 class LineHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
+        name = project_info()
+        one = '2016-01-01'
+        two = '2016-09-01'
+        if is_superuser:
+            projectid = 1000363
+            project_name = name[projectid]
+            projectname = name
+
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectid = id_list[0]
+            projectid = int(projectid)
+            project_name = name[projectid]
+            projectname = filter_grouplist(id_list, name)
+        end = 1000000
+        scale = 1000000
+        labels, dataline = project_costline(one, two, projectid)
+        self.render('lineall.html',
+                    flow=dataline, labels=labels, end=end,
+                    scale=scale, one=one, two=two, projectname=projectname, program=project_name,
+                    projectid=projectid, user_basename=username)
+
+    @tornado.web.authenticated
+    def post(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
+        name = project_info()
+        one = self.get_argument('one')
+        two = self.get_argument('two')
+        projectid = self.get_argument('three')
+        projectid = int(projectid)
+        project_name = name[projectid]
+        end = 1000000
+        scale = 1000000
+        if is_superuser:
+            projectname = name
+        else:
+            group = mysqlgroup(username)
+            id_list = dictkey(group, name)
+            projectname = filter_grouplist(id_list, name)
+
+        labels, dataline = project_costline(one, two, projectid)
+        self.render('lineall.html',
+                    flow=dataline, labels=labels, end=end,
+                    scale=scale, one=one, two=two, projectname=projectname, program=project_name,
+                    projectid=projectid, user_basename=username)
+
+
+class LineprogramHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         username = self.current_user
@@ -261,12 +330,12 @@ class LineHandler(BaseHandler):
             id_list = dictkey(group, name)
             projectid = id_list[0]
             projectid = int(projectid)
-            project_name = projectid
+            project_name = name[projectid]
             projectname = filter_grouplist(id_list, name)
         end = 1000000
         scale = 1000000
         labels, dataline = project_costline(one, two, projectid)
-        self.render('lineall.html',
+        self.render('lineprogram.html',
                     flow=dataline, labels=labels, end=end,
                     scale=scale, one=one, two=two, projectname=projectname, program=project_name,
                     projectid=projectid, user_basename=username)
@@ -295,10 +364,11 @@ class LineHandler(BaseHandler):
             projectname = filter_grouplist(id_list, name)
 
         labels, dataline = project_costline(one, two, projectid)
-        self.render('line.html',
+        self.render('lineprogram.html',
                     flow=dataline, labels=labels, end=end,
                     scale=scale, one=one, two=two, projectname=projectname, program=project_name,
-                    projectid=projectid)
+                    projectid=projectid, user_basename=username)
+
 
 
 class TableHandler(BaseHandler):
@@ -413,10 +483,11 @@ class ProgramHandler(BaseHandler):
         projectid = id_list[0]
         projectid = int(projectid)
         groupname = name[int(projectid)]
+        # groupname = int(projectid)
         data = project_cost(one, two, projectid)
         print data
         self.render('program.html', cost=data, user_basename=user_basename, program=group, one=one, two=two,
-                    projectname=projectname, groupname=json.dumps(groupname), projectid=projectid)
+                    projectname=projectname, groupname=groupname, projectid=projectid)
 
     def post(self):
         user_basename = self.current_user
@@ -429,10 +500,11 @@ class ProgramHandler(BaseHandler):
         projectid = self.get_argument('three')
         projectid = int(projectid)
         groupname = name[int(projectid)]
+        # groupname = int(projectid)
         data = project_cost(one, two, projectid)
         print data
         self.render('program.html', cost=data, user_basename=user_basename, program=group, one=one, two=two,
-                    projectname=projectname, groupname=json.dumps(groupname), projectid=projectid)
+                    projectname=projectname, groupname=groupname, projectid=projectid)
 
 
 class LoginHandler(BaseHandler):

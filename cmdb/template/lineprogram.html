@@ -1,22 +1,12 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8" />
-		<title>ichartjs 示例</title>
-		<meta name="Description" content="The ichartjs's gallery center,ichartjs 示例中心" />
-		<meta name="Keywords" content="ichartjs demo,Html5 demo,ichartjs示例,ichartjs示例,Html5示例,Html5示例" />
-		<script src='/static/js/ichart.1.2.1.min.js'></script>
-		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-		<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-		<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-		<script src="/static/laydate/laydate.js"></script>
+{% extends 'baseuser.html' %}
+
+{%  block barcanv %}
 		<script type="text/javascript">
 		$(function(){
 			var flow= {{ flow}};
             var end={{ end }};
             var scale = {{ scale }};
-			var text = {{ program}};
-
+			var text = "{{program}}";
 			var data = [
 			         	{
 			         		name : '费用',
@@ -55,8 +45,8 @@
 					padding:'0 28',
 					color:'#000000'
 				},
-				width : 700,
-				height : 500,
+				width : 1000,
+				height : 600,
 				shadow:false,
 				shadow_color : '#202020',
 				shadow_blur : 8,
@@ -94,19 +84,21 @@
 					point_size:8
 				},
 				coordinate:{
-					width:550,
-					height:360,
+					width:800,
+					height:500,
 					striped_factor : 0.18,
-					grid_color:'#ffffff',
+					grid_color:'#d8d8d8',
+					grid_line_width:0.8,
 					axis:{
-						color:'#ffffff',
-						width:[0,0,4,4]
+						color:'#c0d0e0',
+						width:[0,0,1,0]
 					},
 					scale:[{
 						 position:'left',
-						 start_scale:0,
-						 end_scale: end,
-						 scale_space: scale,
+//						 start_scale:0,
+//						 end_scale: end,
+//						 scale_space: scale,
+						 scale_share:5,
 						 scale_size:2,
 						 scale_enable : true,
 						 label : {color:'#000000',font : '微软雅黑',fontsize:6 ,fontweight:400},
@@ -142,49 +134,29 @@
 		chart.draw();
 	});
 	</script>
-</head>
-<body>
-            <form action="/line/" method="post" id="formid">
-               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <select name="three"  id="selectone"  class="form-control input-small" style = "width:180px;display: inline;">
+
+{% end %}
+
+{% block body %}
+			  <div>
+            <form action="/lineprogram/" method="post" id="formid">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<select name="three"  id="selectone"  class="form-control input-small" style = "width:200px;display: inline;">
              <% request.setCharacterEncoding("utf-8");%>
-             <!--<option value="所有游戏业务项目" >所有游戏业务项目</option>-->
-                    {% for key,value in projectname.items() %}
+{% for key,value in projectname.items() %}
 			{% if key == projectid %}
              <option value={{ key }}   selected="selected" >{{ value }}</option>
 			{% else %}
 				<option value={{ key }}  >{{ value }}</option>
-			{% end %}
-                    {% end %}
-                    </select>
-             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="hello" class="laydate-icon" name="one" value={{ one }}>到<input id="hello1" class="laydate-icon" name="two" value={{ two }}></input>&nbsp;<button type="submit" class="btn btn-primary">提交</button>
+			{% end%}
+
+
+{% end %}
+         </select>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="hello" class="laydate-icon" name="one" value= {{ one }}>到<input id="hello1" class="laydate-icon" name="two" value= {{ two }}></input>&nbsp;<button type="submit" class="btn btn-primary">提交</button>
             </form>
-	<div id='canvasDiv'></div>
-</body>
-
-<script>
-laydate.skin('danlan')
-laydate({
-    elem: '#hello', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
-    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
-
-});
-</script>
-<script>
-laydate.skin('danlan')
-laydate({
-    elem: '#hello1', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
-    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
-
-});
-</script>
+               </div>
+			<div id='canvasDiv' style="float: left"></div>
 
 
-<script>
- $("#selectone").change(function(){
-      document.getElementById('formid').submit()
-
- });
-</script>
-
-</html>
+{% end %}

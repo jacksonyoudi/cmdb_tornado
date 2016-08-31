@@ -152,6 +152,14 @@
    <div class="text"><a href="#">职员状态</a></div>
    <div class="clear"></div>
 </th>
+<th scope="col" class="sortable">
+
+
+
+   <div class="text"><a href="#">用户状态</a></div>
+   <div class="clear"></div>
+</th>
+
 </tr>
 </thead>
 <tbody>
@@ -159,11 +167,11 @@
 {%  for i in userlist %}
  {%  if i.id%2 == 1 %}
 
-<tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }} name="_selected_action"></td><th><a href="/userdetail/{{i.id}}">{{ i.username }}</a></th><td>{{ i.email }}</td><td> {{ i.last_name }}</td><td> {{ i.first_name }}</td><td>{% if i.is_staff == 1 %}<img src="/static/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/img/icon-no.gif" alt="False"> {% end %}</td></tr>
+<tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }} name="_selected_action"></td><th><a href="/userdetail/{{i.id}}">{{ i.username }}</a></th><td>{{ i.email }}</td><td> {{ i.last_name }}</td><td> {{ i.first_name }}</td><td>{% if i.is_staff == 1 %}<img src="/static/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/img/icon-no.gif" alt="False"> {% end %}</td><td>{% if i.is_active == 1 %}<img src="/static/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/img/icon-no.gif" alt="False"> {% end %}</td></tr>
 
 {% else %}
 
-<tr class="row2"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }}  name="_selected_action"></td><th><a href="/userdetail/{{i.id}}">{{ i.username }}</a></th><td>{{ i.email }} </td><td> {{ i.last_name }}</td><td>{{ i.first_name }}</td><td>{% if i.is_staff == 1 %}<img src="/static/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/img/icon-no.gif" alt="False"> {% end %}</td></tr>
+<tr class="row2"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }}  name="_selected_action"></td><th><a href="/userdetail/{{i.id}}">{{ i.username }}</a></th><td>{{ i.email }} </td><td> {{ i.last_name }}</td><td>{{ i.first_name }}</td><td>{% if i.is_staff == 1 %}<img src="/static/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/img/icon-no.gif" alt="False"> {% end %}</td><td>{% if i.is_active == 1 %}<img src="/static/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/img/icon-no.gif" alt="False"> {% end %}</td></tr>
 
 {% end %}
 

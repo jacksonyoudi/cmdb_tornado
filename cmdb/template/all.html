@@ -7,14 +7,14 @@
 	var data = {{ cost }};
     var end = {{ end }};
     var scale = {{ scale }};
-//    var one = {{ progname }}
+    var one = "{{ progname }}";
 //    var value = {{ progname }};
 
 	 $(function(){
 		var chart = new iChart.Column2D({
 			render : 'canvasDiv',//渲染的Dom目标,canvasDiv为Dom的ID
 			data: data,//绑定数据
-			width : 1000,//设置宽度，默认单位为px
+			width : 1200,//设置宽度，默认单位为px
 			height : 600,//设置高度，默认单位为px
 			shadow:true,//激活阴影
             animation:Boolean, //激活动画.
@@ -36,23 +36,23 @@
 						}
 					}
 				},
-//            footnote:{
-//                  text: one,
-//                  color:"#000000",
-//                  fontsize: 20,
-//                  font:"微软雅黑",
-//                  textAlign:"center",
-//                  height:20,
-//                  offsetx:-20,
-//                  offsety: -10
-//            },
+            footnote:{
+                  text: one,
+                  color:"#000000",
+                  fontsize: 20,
+                  font:"微软雅黑",
+                  textAlign:"center",
+                  height:20,
+                  offsetx:-20,
+                  offsety: -10
+            },
 			shadow_color:'#c7c7c7',//设置阴影颜色
 			coordinate:{//配置自定义坐标轴
 				scale:[{//配置自定义值轴
 					 position:'left',//配置左值轴
-					 start_scale:0,//设置开始刻度为0
-					 end_scale:end,//设置结束刻度为26
-					 scale_space:scale,//设置刻度间距
+//					 start_scale:0,//设置开始刻度为0
+//					 end_scale:end,//设置结束刻度为26
+//					 scale_space:scale,//设置刻度间距
 					 listeners:{//配置事件
 						parseText:function(t,x,y){//设置解析值轴文本
 							return {text:t}
@@ -87,7 +87,7 @@
 
 
 {% block context %}
-            <div>
+<div>
             <form action="/update/" method="post" id="formid">
                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <select name="three"  id="selectone"  class="form-control input-small" style = "width:200px;display: inline;">
@@ -104,12 +104,8 @@
 
          </select>
 
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="hello" class="laydate-icon" name="one" value={{ one }}>到<input id="hello1" class="laydate-icon" name="two" value={{ two }}></input>&nbsp;<button type="submit" class="btn btn-primary" id="smid">提交</button>&nbsp;<button type="button" class="btn btn-default btn-primary" id="haha"><span>曲线图</span></button>&nbsp;<button type="button" class="btn btn-default btn-primary" id="hao"><span>表格</span></button>
-                <button type="button" class="btn btn-default btn-primary" id="xiangmu"><span>项目信息</span></button>
-            </form>
-               </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="hello" class="laydate-icon" name="one" value={{ one }}>到<input id="hello1" class="laydate-icon" name="two" value={{ two }}></input>&nbsp;<button type="submit" class="btn btn-primary" id="smid">提交</button>&nbsp;                            </form>
+</div>
 			<div id='canvasDiv' style="float: left"></div>
-
-        </div>
 
 {%  end %}
