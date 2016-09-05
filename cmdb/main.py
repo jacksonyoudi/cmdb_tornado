@@ -48,6 +48,7 @@ class Application(tornado.web.Application):
             (r"/login/", LoginHandler),
             (r"/logout/", LogoutHandler),
             (r"/program/", ProgramHandler),
+            # (r"/allcost/", AllcostHandler),
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "template"),
