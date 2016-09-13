@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+        <link rel="shortcut icon" type="image/x-icon" href="/static/admin/img/favicon.ico">
+		<title>权限管理</title>
+        {% block extralink %}{%  end %}
+		<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/static/admin/css/dashboard.css">
+        <link rel="stylesheet" type="text/css" href="/static/admin/css/changelists.css">
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+        {% block barcanvscript %} {% end %}
+</head>
+{% block  body  %} {% end  %}
+
+<div class="panel panel-primary">
+<div class="panel-heading">
+<h3 class="panel-title"><span><img src="/static/admin/img/logo.png" alt="logo"></span>
+    <div class="btn-group pull-right" style="background-color: aliceblue">
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">{{user_basename}}</span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="/logout/">Logout</a></li>
+                    <li><a href="/allview/">返回成本管理</a></li>
+                </ul>
+           </div>
+</h3>
+
+
+</div>
+        <div class="col-md-12 well" >
+            {% block context %}{% end %}
+        </div>
+</div>
+
+</div>
+
+
+
+
+</body>
+
+
+</html>

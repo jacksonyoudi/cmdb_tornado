@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block extralink %}
+<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/css/changelists.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/css/ie.css" >
+<script type="text/javascript" src="/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/admin/js/actions.js"></script>
+
+{% end %}
+
+
+{% block body %} <body style='background-color:#fcfcfc;' class="change-list"  > {% end %}
+
+
+
+{% block barcanvscript %}
+<script type="text/javascript">
+(function($) {
+    $(document).ready(function($) {
+        $("tr input.action-select").actions();
+    });
+})(django.jQuery);
+</script>
+{% end %}
+
+{% block context %}
+<!-- Container -->
+
+<div class="breadcrumbs">
+<a href="/">首页</a>
+› <a href="/user/">User</a>
+› 用户
+</div>
+
+{% if one %}
+<ul class="messagelist"> <li class="info">成功删除了 {{ one }} 个 用户</li> </ul>
+{% end %}
+    <!-- Content -->
+    <div id="content" class="flex">
+
+        <h3>选择 用户 来修改</h3>
+
+  <div id="content-main">
+
+
+        <ul class="object-tools">
+
+            <li>
+              <a href="/useradd/" class="addlink">
+                增加 用户
+              </a>
+            </li>
+
+        </ul>
+
+
+
+    <div class="module filtered" id="changelist">
+
+
+<div id="toolbar"><form id="changelist-search" action="/user/" method="get">
+<div><!-- DIV needed for valid HTML -->
+<label for="searchbar"><img src="/static/admin/img/icon_searchbox.png" alt="Search"></label>
+<input type="text" size="40" name="q" value="" id="searchbar">
+<input type="submit" value="搜索">
+
+
+</div>
+</form></div>
+<script type="text/javascript">document.getElementById("searchbar").focus();</script>
+
+
+
+
+
+
+        
+
+      <form id="changelist-form" action="/user/" method="post"><div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="0qUdiuSkOBHKSwWHQmHdl3YrNFzUA3ow"></div>
+
+
+
+
+<div class="actions">
+    <label>动作 <select name="action">
+<option value="" selected="selected">---------</option>
+<option value="delete_selected">删除所选的 用户</option>
+</select></label><input type="hidden" class="select-across" value="0" name="select_across">
+    <button type="submit" class="button" title="运行选中的动作" name="index" value="0">执行</button>
+
+        <script type="text/javascript">var _actions_icnt="6";</script>
+        <span class="action-counter" style="display: inline;">{{count}}个</span>
+
+
+</div>
+
+
+
+
+<div class="results">
+<table id="result_list">
+<thead>
+<tr>
+
+<th scope="col" class="action-checkbox-column">
+
+   <div class="text"><span><input type="checkbox" id="action-toggle" style="display: inline-block;"></span></div>
+   <div class="clear"></div>
+</th>
+<th scope="col" class="sortable sorted ascending">
+
+
+       <div class="sortoptions">
+         <a class="sortremove" href="/user/" title="删除排序"></a>
+
+         <a href="/user/" class="toggle ascending" title="正逆序切换"></a>
+       </div>
+
+
+   <div class="text"><a href="#">用户名</a></div>
+   <div class="clear"></div>
+</th>
+<th scope="col" class="sortable">
+
+
+
+   <div class="text"><a href="#">E-mail 地址</a></div>
+   <div class="clear"></div>
+</th>
+<th scope="col" class="sortable">
+
+
+
+   <div class="text"><a href="#">名字</a></div>
+   <div class="clear"></div>
+</th>
+<th scope="col" class="sortable">
+
+
+
+   <div class="text"><a href="#">姓氏</a></div>
+   <div class="clear"></div>
+</th>
+<th scope="col" class="sortable">
+
+
+
+   <div class="text"><a href="#">职员状态</a></div>
+   <div class="clear"></div>
+</th>
+<th scope="col" class="sortable">
+
+
+
+   <div class="text"><a href="#">用户状态</a></div>
+   <div class="clear"></div>
+</th>
+
+<th scope="col" class="sortable">
+
+
+
+   <div class="text"><a href="#">管理员</a></div>
+   <div class="clear"></div>
+</th>
+
+
+</tr>
+</thead>
+<tbody>
+
+{%  for i in userlist %}
+ {%  if i.id%2 == 1 %}
+
+<tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }} name="_selected_action"></td><th><a href="/userdetail/{{i.id}}">{{ i.username }}</a></th><td>{{ i.email }}</td><td> {{ i.last_name }}</td><td> {{ i.first_name }}</td><td>{% if i.is_staff == 1 %}<img src="/static/admin/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/admin/img/icon-no.gif" alt="False"> {% end %}</td><td>{% if i.is_active == 1 %}<img src="/static/admin/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/admin/img/icon-no.gif" alt="False"> {% end %}</td><td>{% if i.is_superuser == 1 %}<img src="/static/admin/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/admin/img/icon-no.gif" alt="False"> {% end %}</td></tr>
+
+{% else %}
+
+<tr class="row2"><td class="action-checkbox"><input type="checkbox" class="action-select" value={{ i.id }}  name="_selected_action"></td><th><a href="/userdetail/{{i.id}}">{{ i.username }}</a></th><td>{{ i.email }} </td><td> {{ i.last_name }}</td><td>{{ i.first_name }}</td><td>{% if i.is_staff == 1 %}<img src="/static/admin/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/admin/img/icon-no.gif" alt="False"> {% end %}</td><td>{% if i.is_active == 1 %}<img src="/static/admin/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/admin/img/icon-no.gif" alt="False"> {% end %}</td><td>{% if i.is_superuser == 1 %}<img src="/static/admin/img/icon-yes.gif" alt="True"> {% else %} <img src="/static/admin/img/icon-no.gif" alt="False"> {% end %}</td></tr>
+
+{% end %}
+
+{% end %}
+
+</tbody>
+</table>
+</div>
+
+
+
+
+
+
+<p class="paginator">
+
+{{ count }} 用户
+
+
+</p>
+
+      </form>
+    </div>
+  </div>
+
+
+        <br class="clear">
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+<!-- END Container -->
+{% end %}

@@ -1,103 +1,17 @@
-#!/usr/bin/env python
 # coding: utf8
-
-import os.path
 import tornado.web
-import tornado.ioloop
-import tornado.httpserver
-import tornado.options
-import MySQLdb
-from MySQLdb.constants import FIELD_TYPE  # 处理mysqldb拉取数据datetime--》string 以及 long--->int
-import json
-import sys
-import torndb
-import tornado.httpserver
-
-from tornado.options import define, options
-import session
-
-define("port", default=8080, help="run on the given port", type=int)
-define("mysql_host", default="127.0.0.1:3306", help="db host")
-define("mysql_database", default="tornado", help="db name")
-define("mysql_user", default="tornado", help="db user")
-define("mysql_password", default="tornado", help="db password")
-
-
-class Application(tornado.web.Application):
-    def __init__(self):
-        # url 路由
-        handlers = [
-            (r"/", IndexHandler),
-            (r"/user/", UserHandler),
-            (r"/password/([0-9]+)", PasswordHandler),
-            (r"/useradd/", UseraddHandler),
-            (r"/userdetail/([0-9]+)", UserdetailHandler),
-            (r"/group/", GroupHandler),
-            (r"/groupdelete/", GroupdeleteHandler),
-            (r"/userdelete/", UserdeleteHandler),
-            (r"/groupadd/", GroupaddHandler),
-            (r"/login/", LoginHandler),
-            (r"/logout/", LogoutHandler),
-            (r"/back/", BackHandler),
-            (r"/groupdetail/([0-9]+)", GroupdetailHandler),
-        ]
-        settings = dict(
-            template_path=os.path.join(os.path.dirname(__file__), "templates"),
-            static_path=os.path.join(os.path.dirname(__file__), "static"),
-            debug=True,
-            # 设置 cookie
-            cookie_secret="bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
-            login_url="/login/",  # 默认网页，用户未登陆之前，会自动跳转到此url
-        )
-        tornado.web.Application.__init__(self, handlers, **settings)
-        self.db = torndb.Connection(
-            host=options.mysql_host,
-            database=options.mysql_database,
-            user=options.mysql_user,
-            password=options.mysql_password
-        )  # 将数据库连接做成对象
-
-
-def mysqlinsert(sql):  # 定义插入数据库的函数
-    try:
-        conn = MySQLdb.connect(db='tornado', host='localhost', user='tornado', passwd='tornado', port=3306)
-        cur = conn.cursor()
-        cur.execute(sql)
-        cur.close()
-        conn.commit()
-        conn.close()
-    except Exception, e:
-        print "error"
-        print e
-
-
-def password_md5(password_string):  # 生成密码MD5校验
-    string = 'openssl passwd -1 %s' % password_string
-    output = os.popen(string)
-    result = output.read()
-    result = result.replace('\n', '')
-    return result
-
-
-def check_password(password_string, password):  # 对密码进行校验，参数为数据库密码和用户输入的密码
-    salt = password_string.split('$')[2]
-    string = 'openssl passwd -1 -salt %s   %s' % (salt, password)
-    output = os.popen(string)
-    result = output.read()
-    result = result.replace('\n', '')
-    return result
-
+from method.method import *
 
 class BaseHandler(tornado.web.RequestHandler):  # 定义一个基础类
     def get_current_user(self):
         return self.get_secure_cookie("username")  # 用于追踪用户的身份
 
 
-class IndexHandler(BaseHandler):  # 返回首页
+class AdminIndexHandler(BaseHandler):  # 返回首页
     @tornado.web.authenticated
     def get(self):
         user_basename = self.current_user
-        self.render('index.html', user_basename=user_basename)
+        self.render('./admin/index.html', user_basename=user_basename)
 
 
 class UserHandler(BaseHandler):  # 显示用户列表的handler
@@ -110,7 +24,7 @@ class UserHandler(BaseHandler):  # 显示用户列表的handler
         db.close()
         count = len(userlist)
         one = 0
-        self.render('user.html', userlist=userlist, count=count, one=one, user_basename=user_basename)
+        self.render('./admin/user.html', userlist=userlist, count=count, one=one, user_basename=user_basename)
 
     @tornado.web.authenticated
     def post(self):
@@ -130,7 +44,7 @@ class UserHandler(BaseHandler):  # 显示用户列表的handler
         # userlist = db.query(sql)
         # db.close()
         # count = len(userlist)
-        self.render('userdelete.html', users=users, user_basename=user_basename)
+        self.render('./admin/userdelete.html', users=users, user_basename=user_basename)
 
 
 class UseraddHandler(BaseHandler):  # 用户添加
@@ -140,7 +54,7 @@ class UseraddHandler(BaseHandler):  # 用户添加
         passworderr = 0
         username = ''
         useranother = 0
-        self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother,
+        self.render('./admin/useradd.html', passworderr=passworderr, username=username, useranother=useranother,
                     user_basename=user_basename)
 
     @tornado.web.authenticated
@@ -152,7 +66,7 @@ class UseraddHandler(BaseHandler):  # 用户添加
         if password1 != password2:
             passworderr = 1
             useranother = 0
-            self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother,
+            self.render('./admin/useradd.html', passworderr=passworderr, username=username, useranother=useranother,
                         user_basename=user_basename)
         else:
             print password1
@@ -192,7 +106,8 @@ class UseraddHandler(BaseHandler):  # 用户添加
                 db.close()
                 password_string = 0
                 useradd_success = username
-                self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
+                self.render('./admin/userdetail.html', userdetail=userdetail, grouplist=grouplist,
+                            group_list=group_list,
                             password_string=password_string, useradd_success=useradd_success,
                             user_basename=user_basename)
 
@@ -200,7 +115,7 @@ class UseraddHandler(BaseHandler):  # 用户添加
                 passworderr = 0
                 useranother = username
                 username = ''
-                self.render('useradd.html', passworderr=passworderr, username=username, useranother=useranother,
+                self.render('./admin/useradd.html', passworderr=passworderr, username=username, useranother=useranother,
                             user_basename=user_basename)
 
             if user_save:
@@ -231,7 +146,7 @@ class UserdetailHandler(BaseHandler):  # 用户的详细信息的handler
         db.close()
         password_string = 0
         useradd_success = 0
-        self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
+        self.render('./admin/userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
                     password_string=password_string, useradd_success=useradd_success, user_basename=user_basename)
 
     @tornado.web.authenticated
@@ -299,7 +214,7 @@ class UserdetailHandler(BaseHandler):  # 用户的详细信息的handler
             db.close()
             password_string = 0
             useradd_success = username
-            self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
+            self.render('./admin/userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
                         password_string=password_string, useradd_success=useradd_success, user_basename=user_basename)
 
         if addanother:
@@ -322,7 +237,7 @@ class GroupHandler(BaseHandler):
         db.close()
         one = 0
         group_name = 0
-        self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
+        self.render('./admin/group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
                     user_basename=user_basename)
 
     @tornado.web.authenticated
@@ -339,7 +254,7 @@ class GroupHandler(BaseHandler):
             a = db.get(sql)
             groupdelete.append(a)
         db.close()
-        self.render('groupdelete.html', groupdelete=groupdelete, user_basename=user_basename)
+        self.render('./admin/groupdelete.html', groupdelete=groupdelete, user_basename=user_basename)
 
 
 class GroupaddHandler(BaseHandler):
@@ -347,7 +262,7 @@ class GroupaddHandler(BaseHandler):
     def get(self):
         user_basename = self.current_user
         group_addname = 0
-        self.render('groupadd.html', group_addname=group_addname, user_basename=user_basename)
+        self.render('./admin/groupadd.html', group_addname=group_addname, user_basename=user_basename)
 
     @tornado.web.authenticated
     def post(self):
@@ -371,7 +286,7 @@ class GroupaddHandler(BaseHandler):
         if group_addanother:
             group_addname = group_name
             print group_addname
-            self.render('groupadd.html', group_addname=group_addname)
+            self.render('./admin/groupadd.html', group_addname=group_addname)
 
         if group_save:
             db = self.application.db
@@ -381,7 +296,7 @@ class GroupaddHandler(BaseHandler):
             db.close()
             one = 0
             print group_name
-            self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
+            self.render('./admin/group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
                         user_basename=user_basename)
 
         if group_continue:
@@ -395,7 +310,7 @@ class GroupdetailHandler(BaseHandler):
         db = self.application.db
         sql = "select * from auth_group where id=%s;" % id
         groupdetail = db.get(sql)
-        self.render('groupdetail.html', groupdetail=groupdetail, user_basename=user_basename)
+        self.render('./admin/groupdetail.html', groupdetail=groupdetail, user_basename=user_basename)
 
 
 class PasswordHandler(BaseHandler):
@@ -442,7 +357,7 @@ class PasswordHandler(BaseHandler):
             print group_list
             db.close()
             password_string = 1
-            self.render('userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
+            self.render('./admin/userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
                         password_string=password_string, user_basename=user_basename)
 
         else:
@@ -453,7 +368,7 @@ class PasswordHandler(BaseHandler):
             print data
             username = data['username']
             db.close()
-            self.render('password.html', username=username, id=id, alter_string=alter_string,
+            self.render('./admin/password.html', username=username, id=id, alter_string=alter_string,
                         user_basename=user_basename)
 
 
@@ -476,7 +391,7 @@ class UserdeleteHandler(BaseHandler):
         db.close()
         count = len(userlist)
         one = delete_count
-        self.render('user.html', userlist=userlist, count=count, one=one, user_basename=user_basename)
+        self.render('./admin/user.html', userlist=userlist, count=count, one=one, user_basename=user_basename)
 
 
 class GroupdeleteHandler(BaseHandler):
@@ -499,14 +414,14 @@ class GroupdeleteHandler(BaseHandler):
         db.close()
         one = delete_count
         group_name = 0
-        self.render('group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
+        self.render('./admin/group.html', groupdict=groupdict, count=count, one=one, group_name=group_name,
                     user_basename=user_basename)
 
 
 class LoginHandler(BaseHandler):
     def get(self):
         error = 0
-        self.render('login.html', error=error, limit=0)
+        self.render('./admin/login.html', error=error, limit=0)
 
     def post(self):
         data = self.request.arguments
@@ -534,34 +449,22 @@ class LoginHandler(BaseHandler):
                     else:
                         error = 0
                         limit = 1
-                        self.render("login.html", error=error, limit=limit)
+                        self.render("./admin/login.html", error=error, limit=limit)
                 else:
                     error = 1
                     limit = 0
-                    self.render("login.html", error=error, limit=limit)
+                    self.render("./admin/login.html", error=error, limit=limit)
 
             else:
                 error = 1
-                self.render("login.html", error=error, limit=0)
+                self.render("./admin/login.html", error=error, limit=0)
         else:
             error = 1
-            self.render("login.html", error=error, limit=0)
+            self.render("./admin/login.html", error=error, limit=0)
 
 
 class LogoutHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         self.clear_cookie("username")
-        self.redirect('http://139.129.47.28:8090/login/')
-
-
-class BackHandler(BaseHandler):
-    def get(self):
-        self.redirect("http://139.129.47.28:8090")
-
-
-if __name__ == "__main__":
-    tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Application())
-    http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+        self.redirect('/login/')

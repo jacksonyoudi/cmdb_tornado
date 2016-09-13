@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block extralink %}
+<link rel="stylesheet" type="text/css" href="/static/admin//css/base.css">
+<link rel="stylesheet" type="text/css" href="/static/admin//css/dashboard.css">
+<link rel="stylesheet" type="text/css" href="/static/admin//css/ie.css" />
+{% end %}
+
+{% block body %} <body style='background-color:#fcfcfc;' class="dashboard"  > {% end %}
+
+
+{% block context %}
+<div id="container">
+
+    <div id="content" class="colMS">
+
+        <h3>权限管理</h3>
+
+<div id="content-main">
+
+        <div class="module">
+
+        <table summary="">
+        <caption><a href="/" class="section">Auth</a></caption>
+
+            <tbody><tr>
+
+                <th scope="row"><a href="/user/">用户</a></th>
+
+
+
+                <td><a href="/useradd/" class="addlink">增加</a></td>
+
+
+
+                <td><a href="/user/" class="changelink">修改</a></td>
+
+            </tr>
+
+            <tr>
+
+                <th scope="row"><a href="/group/">组</a></th>
+
+
+
+                <td><a href="/groupadd/" class="addlink">增加</a></td>
+
+
+
+                <td><a href="/group/" class="changelink">修改</a></td>
+
+            </tr>
+
+        </tbody>
+        </table>
+
+        </div>
+    
+    <div class="module">
+        <table summary="模型在 Sites 应用中可用。">
+        <caption><a href="/" class="section">Sites</a></caption>
+
+            <tbody><tr>
+
+                <th scope="row"><a href="#">站点</a></th>
+
+
+
+                <td><a href="#" class="addlink">增加</a></td>
+
+
+
+                <td><a href="#" class="changelink">修改</a></td>
+
+            </tr>
+
+        </tbody></table>
+        </div>
+
+
+</div>
+
+
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>最近动作</h2>
+        <h3>我的动作</h3>
+
+
+
+            <ul class="actionlist">
+
+            <li class="addlink">
+
+                    <a href="#">xiong</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="changelink">
+
+                    <a href="#">ayu</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="changelink">
+
+                    <a href="#">shing</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="addlink">
+
+                    <a href="#">shing</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="changelink">
+
+                    <a href="#">alan</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="addlink">
+
+                    <a href="#">alan</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="changelink">
+
+                    <a href="/">ayu</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="addlink">
+
+                    <a href="/">ayu</a>
+
+                <br>
+
+                    <span class="mini quiet">用户</span>
+
+            </li>
+
+            <li class="addlink">
+
+                    <a href="/">MTel</a>
+
+                <br>
+
+                    <span class="mini quiet">组</span>
+
+            </li>
+
+            <li class="addlink">
+
+                    <a href="/">审核环境</a>
+
+                <br>
+
+                    <span class="mini quiet">组</span>
+
+            </li>
+
+            </ul>
+
+    </div>
+</div>
+
+        <br class="clear">
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% end %}

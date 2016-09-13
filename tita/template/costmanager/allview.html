@@ -1,0 +1,61 @@
+{% extends "base.html"  %}
+
+{% block barcanvscript %}
+<script src="/static/costmanager/js/base.js"></script>
+<script src="/static/costmanager/js/inspinia.js"></script>
+<link href="/static/costmanager/css/style.css" rel="stylesheet">
+{% end %}
+
+{% block context %}
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-success pull-right">Program</span>
+                    <h5>项目总数</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/programlist/">{{ program_count }}</a></h1>
+                    <small>All Program</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-info pull-right">Cost</span>
+                    <h5>本月总费用</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/costlist/">{{month_cost}}</a></h1>
+                    <small>All fee</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-primary pull-right">CVM</span>
+                    <h5>CVM总数</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="#"> <span id="online_users">{{cvm_count}}</span></a></h1>
+
+                    <small>All host</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-danger pull-right">last month</span>
+                    <h5>上月总费用</h5>
+                </div>
+                <div class="ibox-content">
+                        <h1 class="no-margins"><a href="/costlist/"> <span id="online_hosts">{{lastmonth_cost}}</span></a></h1>
+                    <small>ALL fee</small>
+                </div>
+            </div>
+        </div>
+{%  end %}

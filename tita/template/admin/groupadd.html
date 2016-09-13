@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block extralink %}
+<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/css/ie.css" >
+<link rel="stylesheet" type="text/css" href="/static/admin/css/changelists.css">
+<script type="text/javascript" src="/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/admin/js/actions.js"></script>
+<script type="text/javascript" src="/static/admin/js/SelectBox.js.js"></script>
+<script type="text/javascript" src="/static/admin/js/SelectFilter2"></script>
+
+{% end %}
+
+{% block body %} <body style='background-color:#fcfcfc;' class="auth-group change-form"  > {% end %}
+
+{% block context %}
+<div id="container">
+
+    <div class="breadcrumbs">
+        <a href="/">首页</a>
+        › <a href="/group/">group</a>
+        › <a href="/group/">组</a>
+        › 增加 组
+    </div>
+
+    {% if  group_addname %}
+    <ul class="messagelist">
+          <li class="info">组 "{{ group_addname }}" 添加成功。 你可以在下面增加另一个 组 。</li>
+    </ul>
+    {% end %}
+
+    <!-- Content -->
+    <div id="content" class="colM">
+
+        <h1>增加 组</h1>
+        <div id="content-main">
+
+
+
+<form enctype="multipart/form-data" action="/groupadd/" method="post" id="group_form"><div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="E2Puwuz5Sr9wdFVOlwlv4LNI5jirPfCF"></div>
+<div>
+
+
+  <fieldset class="module aligned">
+
+
+
+        <div class="form-row field-name">
+
+
+                <div>
+
+
+                        <label for="id_name" class="required">名称:</label>
+
+                            <input id="id_name" type="text" class="vTextField" name="name" maxlength="80">
+
+
+
+                </div>
+
+        </div>
+
+        <div class="form-row field-permissions">
+
+
+                <div><p class="help"> 按下 "Control"，或者在Mac上按 "Command" 来选择多个值。</p>
+
+
+                        <label for="id_permissions">权限:</label>
+
+                            <script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_permissions", "权限", 0, "/static/admin/"); });</script>
+
+
+
+
+
+
+                <div class="selector"><div class="selector-available"><h2>可用 权限 <img src="/static/admin/img/icon-unknown.gif" width="10" height="10" class="help help-tooltip" title="This is the list of available 权限. You may choose some by selecting them in the box below and then clicking the &quot;Choose&quot; arrow between the two boxes."></h2><p id="id_permissions_filter" class="selector-filter"><label for="id_permissions_input"><img src="/static/admin/img/selector-search.gif" class="help-tooltip" alt="" title="Type into this box to filter down the list of available 权限."></label> <input type="text" placeholder="过滤" id="id_permissions_input"></p><select multiple="multiple" class="filtered" name="permissions_old" id="id_permissions_from">
+
+
+
+<option value="19">admin | 日志记录 | Can add log entry</option><option value="20">admin | 日志记录 | Can change log entry</option><option value="21">admin | 日志记录 | Can delete log entry</option><option value="4">auth | 组 | Can add group</option><option value="5">auth | 组 | Can change group</option><option value="6">auth | 组 | Can delete group</option><option value="1">auth | 权限 | Can add permission</option><option value="2">auth | 权限 | Can change permission</option><option value="3">auth | 权限 | Can delete permission</option><option value="7">auth | 用户 | Can add user</option><option value="8">auth | 用户 | Can change user</option><option value="9">auth | 用户 | Can delete user</option><option value="10">contenttypes | 内容类型 | Can add content type</option><option value="11">contenttypes | 内容类型 | Can change content type</option><option value="12">contenttypes | 内容类型 | Can delete content type</option><option value="13">sessions | 会话 | Can add session</option><option value="14">sessions | 会话 | Can change session</option><option value="15">sessions | 会话 | Can delete session</option><option value="16">sites | 站点 | Can add site</option><option value="17">sites | 站点 | Can change site</option><option value="18">sites | 站点 | Can delete site</option></select><a title="点击选择全部权限。" href="javascript: (function(){ SelectBox.move_all(&quot;id_permissions_from&quot;, &quot;id_permissions_to&quot;); SelectFilter.refresh_icons(&quot;id_permissions&quot;);})()" id="id_permissions_add_all_link" class="selector-chooseall active">全选</a></div><ul class="selector-chooser"><li><a title="选择" href="javascript: (function(){ SelectBox.move(&quot;id_permissions_from&quot;,&quot;id_permissions_to&quot;); SelectFilter.refresh_icons(&quot;id_permissions&quot;);})()" id="id_permissions_add_link" class="selector-add">选择</a></li><li><a title="删除" href="javascript: (function(){ SelectBox.move(&quot;id_permissions_to&quot;,&quot;id_permissions_from&quot;); SelectFilter.refresh_icons(&quot;id_permissions&quot;);})()" id="id_permissions_remove_link" class="selector-remove">删除</a></li></ul><div class="selector-chosen"><h2>选中的 权限 <img src="/static/admin/img/icon-unknown.gif" width="10" height="10" class="help help-tooltip" title="这是已选权限的列表。你可以"></h2><select id="id_permissions_to" multiple="multiple" size="0" name="permissions" class="filtered" style="height: 237px;"></select><a title="删除所有选择的权限。" href="javascript: (function() { SelectBox.move_all(&quot;id_permissions_to&quot;, &quot;id_permissions_from&quot;); SelectFilter.refresh_icons(&quot;id_permissions&quot;);})()" id="id_permissions_remove_all_link" class="selector-clearall">删除全部</a></div></div></div>
+
+        </div>
+
+</fieldset>
+
+
+
+<div class="submit-row">
+<input type="submit" value="保存" class="default" name="_save">
+
+
+<input type="submit" value="保存并增加另一个" name="_addanother">
+<input type="submit" value="保存并继续编辑" name="_continue">
+</div>
+
+
+
+   <script type="text/javascript">document.getElementById("id_name").focus();</script>
+
+
+
+
+<script type="text/javascript">
+(function($) {
+    var field;
+
+
+})(django.jQuery);
+</script>
+
+
+</div>
+</form></div>
+
+
+        <br class="clear">
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+
+
+{% end %}

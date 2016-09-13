@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block extralink %}
+<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
+{% end %}
+
+
+
+{% block body %} <body style='background-color:#fcfcfc;' class="change-list"  > {% end %}
+
+
+{% block context %}
+<div class="breadcrumbs">
+<a href="/admin/">首页</a>
+› <a href="/">Auth</a>
+› <a href="/user/">用户</a>
+› 删除多个对象
+</div>
+
+
+
+
+
+
+
+    <!-- Content -->
+    <div id="content" class="colM">
+
+        <h1>你确定吗？</h1>
+
+
+    <p>请确认要删除选中的 用户 吗？以下所有对象和余它们相关的条目将都会被删除：</p>
+
+        <ul>
+
+            {% for i in users %}
+            <li>用户: <a href="/userdetail/{{ i.id}}">{{i.username}}</a></li>
+	        {%  end %}
+
+
+
+        </ul>
+
+    <form action="/userdelete/" method="post"><div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="E2Puwuz5Sr9wdFVOlwlv4LNI5jirPfCF"></div>
+    <div>
+     {% for i in users %}
+    <input type="hidden" name="_selected_action" value={{i.id}}>
+     {% end  %}
+
+
+    <input type="hidden" name="action" value="delete_selected">
+    <input type="hidden" name="post" value="yes">
+    <input type="submit" value="是的，我确定">
+    </div>
+    </form>
+
+
+
+        <br class="clear">
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+{%  end %}
