@@ -324,7 +324,7 @@ class PasswordHandler(BaseHandler):
         username = data['username']
         db.close()
         alter_string = ''
-        self.render('password.html', username=username, id=id, alter_string=alter_string, user_basename=user_basename)
+        self.render('./admin/password.html', username=username, id=id, alter_string=alter_string, user_basename=user_basename)
 
     @tornado.web.authenticated
     def post(self, id):

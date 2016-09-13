@@ -399,3 +399,44 @@ class LoginHandler(BaseHandler):
         else:
             error = 1
             self.render("./costmanager/login.html", error=error, limit=0)
+
+
+class UserChangePasswordHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        db = self.application.db
+        user_basename = self.current_user
+        username = user_basename
+        sql = "select id,username from auth_user where username='%s'" % username
+        user = db.get(sql)
+        id = user['id']
+        alter_string = ''
+        self.render('./costmanager/userpassword.html', username=username, id=id, alter_string=alter_string, user_basename=user_basename)
+
+    @tornado.web.authenticated
+    def post(self, id):
+        user_basename = self.current_user
+        username = user_basename
+        password1 = self.get_argument('password1')
+        password2 = self.get_argument('password2')
+        if password1 == password2:
+            password = password_md5(password1)
+
+            db = self.application.db
+            sql = "update auth_user set password='%s' where id=%s;" % (password, id)
+            db.execute(sql)
+            db.close()
+            alter_string = '密码修改成功'
+            self.render('./costmanager/userpassword.html',username=username, id=id, alter_string=alter_string,
+                        user_basename=user_basename)
+
+        else:
+            alter_string = '两次密码输入不一致，请重新输入'
+            db = self.application.db
+            sql = 'select * from  auth_user where id=%s;' % id
+            data = db.get(sql)
+            print data
+            username = data['username']
+            db.close()
+            self.render('./costmanager/userpassword.html', username=username, id=id, alter_string=alter_string,
+                        user_basename=user_basename)

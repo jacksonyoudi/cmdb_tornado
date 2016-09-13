@@ -26,5 +26,7 @@ urls = [
     (r"/allview/", AllviewHandler),
     (r"/programlist/", ProgramlistHandler),
     (r"/costlist/", CostlistHandler),
+    (r"/userchangepassword/", UserChangePasswordHandler),
+    (r"/userchangepassword/([0-9]+)", UserChangePasswordHandler),
     # (r"/ip/", IpHandler),
 ]

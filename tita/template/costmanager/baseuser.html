@@ -11,6 +11,8 @@
 		<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
         <script src="/static/costmanager/layer/layer.js"></script>
         <script src="/static/costmanager/laydate/laydate.js"></script>
+{% block extralink %}
+        {% end %}
 
 {% block barcanv %}
         {% end %}
@@ -50,7 +52,7 @@
                 <li><a href="/lineprogram/"><span class="glyphicon glyphicon-th"></span>&nbsp;&nbsp;曲线图</a></li>
                 <li><a href="#" onclick="table_method()"><span class="glyphicon glyphicon-th"></span>&nbsp; 表格</a></li>
                 <li><a href="#" onclick="information_method()"><span class="glyphicon glyphicon-list-alt"></span>&nbsp; 项目信息</a></li>
-                <li><a href="#"><span class="glyphicon glyphicon-th-large"></span>&nbsp;&nbsp;导出数据EXCEL表</a></li>
+                <li><a href="/userchangepassword/"><span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;修改密码</a></li>
 			</ul>
         </div>
 
