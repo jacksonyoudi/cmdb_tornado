@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 
+
 import MySQLdb
 from MySQLdb.constants import FIELD_TYPE
 import sys
@@ -8,10 +9,20 @@ import calendar
 import time
 import os
 
+import sys
 
-def mysqlinsert(sql):  # 定义插入数据库的函数
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+from settings import cmdb_db, admin_db
+
+
+# import sett
+
+def mysqlinsert(sql):  # 定义插入数据库的函数,由于使用torndb出现异常，故改用mysqldb
     try:
-        conn = MySQLdb.connect(db='tornado', host='localhost', user='tornado', passwd='tornado', port=3306)
+        conn = MySQLdb.connect(db=admin_db['db'], host=admin_db['host'], user=admin_db['user'],
+                               passwd=admin_db['passwd'], port=admin_db['port'])
         cur = conn.cursor()
         cur.execute(sql)
         cur.close()
@@ -39,10 +50,10 @@ def check_password(password_string, password):  # 对密码进行校验，参数
     return result
 
 
-
 def mysqlselect(sql):  # 定义查询的mysql数据方法，参数就是sql语句
     my_conv = {FIELD_TYPE.TIMESTAMP: str}
-    conn = MySQLdb.connect(host="localhost", user="ledou", passwd="ledou", db="ledou_cmdb", port=3306,
+    conn = MySQLdb.connect(db=cmdb_db['db'], host=cmdb_db['host'], user=cmdb_db['user'], passwd=cmdb_db['passwd'],
+                           port=cmdb_db['port'],
                            conv=my_conv)
     cur = conn.cursor()
     cur.execute('set names utf8')
@@ -54,7 +65,8 @@ def mysqlselect(sql):  # 定义查询的mysql数据方法，参数就是sql语�
 
 
 def project_info():  # 查询 project_info信息的函数
-    conn = MySQLdb.connect(host="localhost", user="ledou", passwd="ledou", db="ledou_cmdb", port=3306, charset='utf8')
+    conn = MySQLdb.connect(db=cmdb_db['db'], host=cmdb_db['host'], user=cmdb_db['user'], passwd=cmdb_db['passwd'],
+                           port=cmdb_db['port'], charset='utf8')
     cur = conn.cursor()
     sql = 'select projectid,projectName from project_info;'
     cur.execute('set names utf8')
@@ -96,6 +108,26 @@ def project_cost(on, tw, projectid):  # 查询project_cost的函数
     for i in z:
         a.append({'name': i[0], 'value': int(i[1]), 'color': i[2]})
 
+    return a
+
+
+def qcloud_cost():
+    sql = 'select mon_date,fee from cost_mon_all;'
+    t = mysqlselect(sql)
+    d = []
+    l = []
+    for i in t:
+        d.append(str(i[0]))
+        l.append(float(i[1]))
+    b = []
+    for i in range(20):
+        b.append('#32bdbc')
+
+    z = zip(d, l, b)
+
+    a = []
+    for i in z:
+        a.append({'name': i[0], 'value': i[1], 'color': i[2]})
     return a
 
 
@@ -141,7 +173,8 @@ def project_costtable(on, tw, projectid):
 
 def mysqlgroup(username):  # 获取用户组的数据
     try:
-        c = MySQLdb.connect(host='localhost', user='tornado', passwd='tornado', db='tornado', port=3306, charset='utf8')
+        c = MySQLdb.connect(db=admin_db['db'], host=admin_db['host'], user=admin_db['user'],
+                            passwd=admin_db['passwd'], port=admin_db['port'], charset='utf8')
         cur = c.cursor()
         sql = "select  d.name from auth_group as d,(select a.group_id from auth_user_groups as a,(select id from auth_user where username = '%s') as b where a.user_id = b.id) as c where d.id = c.group_id ; " % username
         cur.execute(sql)

@@ -4,6 +4,87 @@
 <script src="/static/costmanager/js/base.js"></script>
 <script src="/static/costmanager/js/inspinia.js"></script>
 <link href="/static/costmanager/css/style.css" rel="stylesheet">
+<script src='/static/costmanager/js/ichart.1.2.1.min.js'></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+<script src="/static/costmanager/laydate/laydate.js"></script>
+<script type='text/javascript'>
+    //定义数据
+	var data = {{ cost }};
+    var one = "{{ name }}";
+
+	 $(function(){
+		var chart = new iChart.Column2D({
+			render : 'canvasDiv',//渲染的Dom目标,canvasDiv为Dom的ID
+			data: data,//绑定数据
+			width : 1000,//设置宽度，默认单位为px
+			height : 500,//设置高度，默认单位为px
+			shadow:true,//激活阴影
+            animation:Boolean, //激活动画.
+            column_width: 35,
+            tip:{
+					enable:true,
+					listeners:{
+						 //tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+						parseText:function(tip,name,value,text,i){
+							//将数字进行千位格式化
+							var f = new String(value);
+							f = f.split("").reverse().join("").replace(/(\d{3})/g,"$1,").split("").reverse();
+							if(f[0]==','){
+								f.shift();
+							}
+							f = f.join("");
+
+							return name+"费用:<br/>"+f+"元";
+						}
+					}
+				},
+            footnote:{
+                  text: one,
+                  color:"#000000",
+                  fontsize: 15,
+                  font:"微软雅黑",
+                  textAlign:"center",
+                  height:20,
+                  offsetx:-20,
+                  offsety: -10
+            },
+			shadow_color:'#c7c7c7',//设置阴影颜色
+			coordinate:{//配置自定义坐标轴
+				scale:[{//配置自定义值轴
+					 position:'left',//配置左值轴
+//					 start_scale:0,//设置开始刻度为0
+//					 end_scale:end,//设置结束刻度为26
+//					 scale_space:scale,//设置刻度间距
+					 listeners:{//配置事件
+						parseText:function(t,x,y){//设置解析值轴文本
+							return {text:t}
+						}
+					}
+				}
+                ]
+			}
+		});
+                //利用自定义组件构造左侧说明文本
+			chart.plugin(new iChart.Custom({
+					drawFn:function(){
+						//计算位置
+						var coo = chart.getCoordinate(),
+							x = coo.get('originx'),
+							y = coo.get('originy');
+						//在左上侧的位置，渲染一个单位的文字
+						chart.target.textAlign('start')
+						.textBaseline('bottom')
+						.textFont('600 11px 微软雅黑')
+						.fillText('费用(单位：元)',x-40,y-10,false,'#6d869f');
+
+					}
+			}));
+		//调用绘图方法开始绘图
+		chart.draw();
+	});
+	</script>
 {% end %}
 
 {% block context %}
@@ -58,4 +139,5 @@
                 </div>
             </div>
         </div>
+    <div id='canvasDiv'></div>
 {%  end %}

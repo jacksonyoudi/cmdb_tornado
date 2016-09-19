@@ -3,6 +3,7 @@ from Admin import BaseHandler
 import tornado.web
 from method.method import *
 
+
 class CostlistHandler(BaseHandler):  # 返回成本列表 网页
     @tornado.web.authenticated
     def get(self):
@@ -15,6 +16,13 @@ class CostlistHandler(BaseHandler):  # 返回成本列表 网页
         costlist = mysqlselect(sql)  # 获取 列表需要的数据
         # print costlist
         self.render('./costmanager/costlist.html', user_basename=user_basename, costlist=costlist)
+
+
+class QcloudcostlistHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        user_basename = self.get_current_user()
+        start, end = month_start_end()
 
 
 class AllviewHandler(BaseHandler):  # 总览的网页
@@ -34,9 +42,15 @@ class AllviewHandler(BaseHandler):  # 总览的网页
         sql = 'select count(*) from cvm_info;'
         cvm_count = mysqlselect(sql)[0][0]  # 获取cvm的数量
 
+        sql = 'select fee from cost_mon_all where mon_date between %s and %s;' % (start, end)
+        qcloud = mysqlselect(sql)[0][0]
+        print qcloud
+        qcloudcost = '%.2f' % float(qcloud)
+        data = qcloud_cost()
+        name='腾讯云每月账单'
         self.render('./costmanager/allview.html', user_basename=user_basename, program_count=program_count,
                     month_cost=month_cost,
-                    lastmonth_cost=lastmonth_cost, cvm_count=cvm_count)
+                    lastmonth_cost=lastmonth_cost, cvm_count=cvm_count, qcloudcost=qcloudcost, cost=data,name=name)
 
 
 class ProgramlistHandler(BaseHandler):  # 项目列表的网页
@@ -411,7 +425,8 @@ class UserChangePasswordHandler(BaseHandler):
         user = db.get(sql)
         id = user['id']
         alter_string = ''
-        self.render('./costmanager/userpassword.html', username=username, id=id, alter_string=alter_string, user_basename=user_basename)
+        self.render('./costmanager/userpassword.html', username=username, id=id, alter_string=alter_string,
+                    user_basename=user_basename)
 
     @tornado.web.authenticated
     def post(self, id):
@@ -427,7 +442,7 @@ class UserChangePasswordHandler(BaseHandler):
             db.execute(sql)
             db.close()
             alter_string = '密码修改成功'
-            self.render('./costmanager/userpassword.html',username=username, id=id, alter_string=alter_string,
+            self.render('./costmanager/userpassword.html', username=username, id=id, alter_string=alter_string,
                         user_basename=user_basename)
 
         else:

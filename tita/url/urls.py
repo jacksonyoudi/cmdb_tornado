@@ -1,6 +1,8 @@
 # coding: utf8
-from handler.Admin import *
-from handler.CostManager import *
+from handler.Admin import AdminIndexHandler, UserHandler, PasswordHandler, UseraddHandler, UserdetailHandler, \
+    GroupHandler, GroupdeleteHandler, UserdeleteHandler, GroupaddHandler, GroupdetailHandler,LogoutHandler
+from handler.CostManager import LoginHandler, BarHandler, LineHandler, LineprogramHandler, TableHandler, \
+    InformationHandler, ProgramHandler, AllviewHandler, ProgramlistHandler, CostlistHandler, UserChangePasswordHandler
 
 urls = [
     (r"/", LoginHandler),
