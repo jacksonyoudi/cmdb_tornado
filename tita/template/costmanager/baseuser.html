@@ -52,6 +52,7 @@
                 <li><a href="/lineprogram/"><span class="glyphicon glyphicon-th"></span>&nbsp;&nbsp;曲线图</a></li>
                 <li><a href="#" onclick="table_method()"><span class="glyphicon glyphicon-th"></span>&nbsp; 表格</a></li>
                 <li><a href="#" onclick="information_method()"><span class="glyphicon glyphicon-list-alt"></span>&nbsp; 项目信息</a></li>
+                <li><a href="/qclouduser/"><span class="glyphicon glyphicon-list-alt"></span>&nbsp; 腾讯云账单</a></li>
                 <li><a href="/userchangepassword/"><span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;修改密码</a></li>
 			</ul>
         </div>
@@ -182,9 +183,75 @@ laydate({
 
     };
 
+         function bar_method(url)
+    {
+          layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '条形图',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '600px'],
+                content: url,
+                shift: 9
+            });
+
+    };
+
+    function line_method(url)
+    {
+          layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '曲线图',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '600px'],
+                content: url,
+                shift: 9
+            });
+
+    };
+
+        function information_method(url)
+    {
+          layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '项目详情',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['700px', '600px'],
+                content: url,
+                shift: 9
+            });
+
+    };
+        function table_method(url)
+    {
+          layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '表格',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: url,
+                shift: 9
+            });
+
+    };
+
 </script>
 
 </body>
-
 
 </html>

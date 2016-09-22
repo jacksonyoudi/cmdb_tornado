@@ -22,7 +22,12 @@ class QcloudcostlistHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         user_basename = self.get_current_user()
-        start, end = month_start_end()
+        start, end = lastmonth_start_end()
+        sql = 'select id,programe_name,cvm_count,fee from cost_mon_program where mon_date between %s and %s;' % (
+            start, end)
+        qcloudcostlist = mysqlselect(sql)
+        print qcloudcostlist
+        self.render('./costmanager/qcloudcostlist.html', user_basename=user_basename, costlist=qcloudcostlist)
 
 
 class AllviewHandler(BaseHandler):  # 总览的网页
@@ -47,10 +52,10 @@ class AllviewHandler(BaseHandler):  # 总览的网页
         print qcloud
         qcloudcost = '%.2f' % float(qcloud)
         data = qcloud_cost()
-        name='腾讯云每月账单'
+        name = '腾讯云每月账单'
         self.render('./costmanager/allview.html', user_basename=user_basename, program_count=program_count,
                     month_cost=month_cost,
-                    lastmonth_cost=lastmonth_cost, cvm_count=cvm_count, qcloudcost=qcloudcost, cost=data,name=name)
+                    lastmonth_cost=lastmonth_cost, cvm_count=cvm_count, qcloudcost=qcloudcost, cost=data, name=name)
 
 
 class ProgramlistHandler(BaseHandler):  # 项目列表的网页
@@ -61,6 +66,17 @@ class ProgramlistHandler(BaseHandler):  # 项目列表的网页
         program_list = mysqlselect(sql)  # 获取项目列表的数据
         print program_list
         self.render('./costmanager/programlist.html', user_basename=user_basename, program=program_list)
+
+
+class QcloudBarHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        one = '2016-01-01'
+        start, two = lastmonth_start_end()
+        projectname = self.get_argument('id')  # 前端网页按钮传递过来的id值，用户锚定项目
+        data = project_qcloudcost(one, two, projectname)  # 项目的成本费用数据
+        self.render('./costmanager/qcloudbar.html', cost=data,
+                    progname=projectname)
 
 
 class BarHandler(BaseHandler):  # 条形图的handler
@@ -100,6 +116,33 @@ class BarHandler(BaseHandler):  # 条形图的handler
         self.render('./costmanager/bar.html', cost=data, projectid=projectid, end=end,
                     scale=scale, one=one, two=two, projectname=name,
                     progname=project_name, user_basename=user_basename)
+
+
+class QcloudLineHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
+        one = '2016-01-01'
+        start1, two = lastmonth_start_end()
+        if is_superuser:  # 判断用户的身份，是否有权限操作
+            projectname = self.get_argument('id')
+
+        else:
+            group = mysqlgroup(username)
+            # id_list = dictkey(group, name)
+            # projectid = id_list[0]
+            # projectid = int(projectid)
+            # project_name = name[projectid]
+            # projectname = filter_grouplist(id_list, name)
+            projectname = self.get_argument('id')
+        name, labels, dataline = qcloudproject_costline(one, two, projectname)  # 绘图需要的数据
+        self.render('./costmanager/qcloudline.html',
+                    flow=dataline, labels=labels, program=name)
 
 
 class LineHandler(BaseHandler):  # 曲线图的handler
@@ -224,6 +267,19 @@ class LineprogramHandler(BaseHandler):  # 普通用户的项目信息handler
                     flow=dataline, labels=labels, end=end,
                     scale=scale, one=one, two=two, projectname=projectname, program=project_name,
                     projectid=projectid, user_basename=username)
+
+
+class QcloudtableHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        start, end = month_start_end()
+        one = '2016-01-01'
+        two = end
+        projectname = self.get_argument('id')
+        fee = qcloud_costtable(one, two, projectname)
+
+        self.render('./costmanager/qcloudtable.html',
+                    dat=fee, program=fee[0][0])
 
 
 class TableHandler(BaseHandler):
@@ -366,6 +422,33 @@ class ProgramHandler(BaseHandler):
         self.render('./costmanager/program.html', cost=data, user_basename=user_basename, program=group, one=one,
                     two=two,
                     projectname=projectname, groupname=groupname, projectid=projectid)
+
+
+class QcloudUserHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        user_basename = self.current_user
+        name = project_info()
+        group = mysqlgroup(user_basename)
+        id_list = dictkey(group, name)
+        projectname = filter_grouplist(id_list, name)
+
+        start, two = lastmonth_start_end()
+        li = []
+        for k, v in projectname.items():
+            li.append(v)
+        st = '('
+        for i in range(len(li)):
+            if i == len(li) - 1:
+                st = st + "'" + str(li[i]) + "'"
+            else:
+                st = st + "'" + str(li[i]) + "'" + ','
+        st = st + ')'
+        print st
+        sql = 'select id,programe_name,cvm_count,fee from cost_mon_program where programe_name in %s and mon_date between %s and %s;' % (
+            st, start, two)
+        data = mysqlselect(sql)
+        self.render('./costmanager/qclouduserlist.html', costlist=data, user_basename=user_basename)
 
 
 class LoginHandler(BaseHandler):

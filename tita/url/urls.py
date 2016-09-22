@@ -1,8 +1,9 @@
 # coding: utf8
 from handler.Admin import AdminIndexHandler, UserHandler, PasswordHandler, UseraddHandler, UserdetailHandler, \
-    GroupHandler, GroupdeleteHandler, UserdeleteHandler, GroupaddHandler, GroupdetailHandler,LogoutHandler
+    GroupHandler, GroupdeleteHandler, UserdeleteHandler, GroupaddHandler, GroupdetailHandler, LogoutHandler
 from handler.CostManager import LoginHandler, BarHandler, LineHandler, LineprogramHandler, TableHandler, \
-    InformationHandler, ProgramHandler, AllviewHandler, ProgramlistHandler, CostlistHandler, UserChangePasswordHandler
+    InformationHandler, ProgramHandler, AllviewHandler, ProgramlistHandler, CostlistHandler, UserChangePasswordHandler, \
+    QcloudcostlistHandler, QcloudtableHandler, QcloudLineHandler, QcloudBarHandler, QcloudUserHandler
 
 urls = [
     (r"/", LoginHandler),
@@ -28,6 +29,13 @@ urls = [
     (r"/allview/", AllviewHandler),
     (r"/programlist/", ProgramlistHandler),
     (r"/costlist/", CostlistHandler),
+    # qcloud
+    (r"/qcloudcostlist/", QcloudcostlistHandler),
+    (r"/qcloudtable/", QcloudtableHandler),
+    (r"/qcloudline/", QcloudLineHandler),
+    (r"/qcloudbar/", QcloudBarHandler),
+    (r"/qclouduser/", QcloudUserHandler),
+    # user password
     (r"/userchangepassword/", UserChangePasswordHandler),
     (r"/userchangepassword/([0-9]+)", UserChangePasswordHandler),
     # (r"/ip/", IpHandler),

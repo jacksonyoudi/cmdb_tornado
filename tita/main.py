@@ -12,6 +12,7 @@ from handler.Admin import *
 from handler.CostManager import *
 from url.urls import urls
 import torndb
+from settings import options
 
 
 class Application(tornado.web.Application):

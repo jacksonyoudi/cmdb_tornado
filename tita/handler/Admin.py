@@ -2,6 +2,7 @@
 import tornado.web
 from method.method import *
 
+
 class BaseHandler(tornado.web.RequestHandler):  # 定义一个基础类
     def get_current_user(self):
         return self.get_secure_cookie("username")  # 用于追踪用户的身份
@@ -324,7 +325,8 @@ class PasswordHandler(BaseHandler):
         username = data['username']
         db.close()
         alter_string = ''
-        self.render('./admin/password.html', username=username, id=id, alter_string=alter_string, user_basename=user_basename)
+        self.render('./admin/password.html', username=username, id=id, alter_string=alter_string,
+                    user_basename=user_basename)
 
     @tornado.web.authenticated
     def post(self, id):
@@ -357,8 +359,9 @@ class PasswordHandler(BaseHandler):
             print group_list
             db.close()
             password_string = 1
+            useradd_success = ''
             self.render('./admin/userdetail.html', userdetail=userdetail, grouplist=grouplist, group_list=group_list,
-                        password_string=password_string, user_basename=user_basename)
+                        password_string=password_string, user_basename=user_basename, useradd_success=useradd_success)
 
         else:
             alter_string = '两次密码输入不一致，请重新输入'

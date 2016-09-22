@@ -8,6 +8,7 @@ import sys
 import calendar
 import time
 import os
+import datetime
 
 import sys
 
@@ -54,7 +55,7 @@ def mysqlselect(sql):  # 定义查询的mysql数据方法，参数就是sql语�
     my_conv = {FIELD_TYPE.TIMESTAMP: str}
     conn = MySQLdb.connect(db=cmdb_db['db'], host=cmdb_db['host'], user=cmdb_db['user'], passwd=cmdb_db['passwd'],
                            port=cmdb_db['port'],
-                           conv=my_conv)
+                           charset='utf8')
     cur = conn.cursor()
     cur.execute('set names utf8')
     cur.execute(sql)
@@ -87,6 +88,30 @@ def project_info():  # 查询 project_info信息的函数
     return name
 
 
+def project_qcloudcost(on, tw, projectname):
+    one = on.replace('-', '', 2)
+    two = tw.replace('-', '', 2)
+    sql = 'select programe_name,mon_date,cvm_count,fee from cost_mon_program where mon_date between "%s" and "%s" and programe_name = "%s";' % (
+        one, two, projectname)
+    t = mysqlselect(sql)
+    print t
+    d = []
+    l = []
+    for i in t:
+        d.append(str(i[1].strftime('%Y-%m')))
+        l.append(float(i[3]))
+    b = []
+    for i in range(20):
+        b.append('#32bdbc')
+
+    z = zip(d, l, b)
+
+    a = []
+    for i in z:
+        a.append({'name': i[0], 'value': i[1], 'color': i[2]})
+    return a
+
+
 def project_cost(on, tw, projectid):  # 查询project_cost的函数
     one = on.replace('-', '', 2)
     two = tw.replace('-', '', 2)
@@ -96,7 +121,7 @@ def project_cost(on, tw, projectid):  # 查询project_cost的函数
     d = []
     l = []
     for i in t:
-        d.append(str(i[0]))
+        d.append(str(i[0].strftime('%Y-%m-%d')))
         l.append(int(i[1]))
     b = []
     for i in range(20):
@@ -117,7 +142,9 @@ def qcloud_cost():
     d = []
     l = []
     for i in t:
-        d.append(str(i[0]))
+        a = i[0].strftime('%Y-%m-%d')
+        b = a.replace('-15', '')
+        d.append(str(b))
         l.append(float(i[1]))
     b = []
     for i in range(20):
@@ -129,6 +156,23 @@ def qcloud_cost():
     for i in z:
         a.append({'name': i[0], 'value': i[1], 'color': i[2]})
     return a
+
+
+def qcloudproject_costline(on, tw, projectname):  # 返回值是传递给曲线图的参数
+    one = on.replace('-', '', 2)
+    two = tw.replace('-', '', 2)
+    sql = 'select programe_name,mon_date,cvm_count,fee from cost_mon_program where mon_date between "%s" and "%s" and programe_name = "%s";' % (
+        one, two, projectname)
+    t = mysqlselect(sql)
+    name = t[0][0]
+    d = []
+    l = []
+    for i in t:
+        d.append(str(i[1].strftime('%Y-%m-%d')).replace('-15', ''))
+        temp = '%.2f' % float(i[3])
+        l.append(temp)
+
+    return name, d, l
 
 
 def project_costline(on, tw, projectid):  # 返回值是传递给曲线图的参数
@@ -146,6 +190,16 @@ def project_costline(on, tw, projectid):  # 返回值是传递给曲线图的参
     return d, l
 
 
+def qcloud_costtable(on, tw, projectname):
+    one = on.replace('-', '', 2)
+    two = tw.replace('-', '', 2)
+    sql = 'select programe_name,mon_date,cvm_count,fee from cost_mon_program where mon_date between "%s" and "%s" and programe_name = "%s";' % (
+        one, two, projectname)
+    print sql
+    t = mysqlselect(sql)
+    return t
+
+
 def project_costtable(on, tw, projectid):
     one = on.replace('-', '', 2)
     two = tw.replace('-', '', 2)
@@ -158,7 +212,7 @@ def project_costtable(on, tw, projectid):
         d.append(str(i[0]))
         l.append(int(i[1]))
     b = []
-    for i in range(20):
+    for i in range(len(t)):
         b.append('#32bdbc')
 
     z = zip(d, l, b)
