@@ -87,15 +87,30 @@ class BarHandler(BaseHandler):  # 条形图的handler
         end = 1000000
         scale = 100000
         one = '2016-01-01'
-        two = '2016-09-01'
+        start, two = lastmonth_start_end()
         projectid = self.get_argument('id')  # 前端网页按钮传递过来的id值，用户锚定项目
         data = project_cost(one, two, projectid)  # 项目的成本费用数据
         t = int(projectid)
         project_name = name[t]  # 项目名
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
+        if is_superuser:  # 判断用户的身份，是否有权限操作
+            projectname = name
+
+        else:
+            group = mysqlgroup(user_basename)
+            id_list = dictkey(group, name)
+            projectid = int(projectid)
+            project_name = name[projectid]
+            projectname = filter_grouplist(id_list, name)
         projectid = t
         print data
         self.render('./costmanager/bar.html', cost=data, projectid=projectid, end=end,
-                    scale=scale, one=one, two=two, projectname=name,
+                    scale=scale, one=one, two=two, projectname=projectname,
                     progname=project_name, user_basename=user_basename)
 
     @tornado.web.authenticated
@@ -109,12 +124,27 @@ class BarHandler(BaseHandler):  # 条形图的handler
         projectid = self.get_argument('three')
         data = project_cost(one, two, projectid)
         t = int(projectid)
+        username = self.current_user
+        db = self.application.db
+        sql = "select * from auth_user where username = '%s';" % username
+        user_info = db.get(sql)
+        db.close()
+        is_superuser = user_info.get('is_superuser')
+        if is_superuser:  # 判断用户的身份，是否有权限操作
+            projectname = name
+
+        else:
+            group = mysqlgroup(user_basename)
+            id_list = dictkey(group, name)
+            projectid = int(projectid)
+            project_name = name[projectid]
+            projectname = filter_grouplist(id_list, name)
         project_name = name[t]
         projectid = t
         print data
         print project_name
         self.render('./costmanager/bar.html', cost=data, projectid=projectid, end=end,
-                    scale=scale, one=one, two=two, projectname=name,
+                    scale=scale, one=one, two=two, projectname=projectname,
                     progname=project_name, user_basename=user_basename)
 
 
@@ -128,7 +158,7 @@ class QcloudLineHandler(BaseHandler):
         db.close()
         is_superuser = user_info.get('is_superuser')
         one = '2016-01-01'
-        start1, two = lastmonth_start_end()
+        start, two = lastmonth_start_end()
         if is_superuser:  # 判断用户的身份，是否有权限操作
             projectname = self.get_argument('id')
 
@@ -156,7 +186,7 @@ class LineHandler(BaseHandler):  # 曲线图的handler
         is_superuser = user_info.get('is_superuser')
         name = project_info()
         one = '2016-01-01'
-        two = '2016-09-01'
+        start, two = lastmonth_start_end()
         if is_superuser:  # 判断用户的身份，是否有权限操作
             projectid = int(self.get_argument('id'))
             project_name = name[projectid]
@@ -218,7 +248,7 @@ class LineprogramHandler(BaseHandler):  # 普通用户的项目信息handler
         is_superuser = user_info.get('is_superuser')
         name = project_info()
         one = '2016-01-01'
-        two = '2016-09-01'
+        start, two = lastmonth_start_end()
         if is_superuser:
             projectid = 1000363
             project_name = projectid
@@ -293,7 +323,7 @@ class TableHandler(BaseHandler):
         is_superuser = user_info.get('is_superuser')
         name = project_info()
         one = '2016-01-01'
-        two = '2016-09-01'
+        start, two = lastmonth_start_end()
         if is_superuser:
             projectid = int(self.get_argument('id'))
             projectname = name
@@ -391,37 +421,69 @@ class ProgramHandler(BaseHandler):
         name = project_info()
         group = mysqlgroup(user_basename)
         id_list = dictkey(group, name)
-        projectname = filter_grouplist(id_list, name)
-        one = '2016-01-01'
-        two = '2016-09-01'
-        projectid = id_list[0]
-        projectid = int(projectid)
-        groupname = name[int(projectid)]
-        # groupname = int(projectid)
-        data = project_cost(one, two, projectid)
-        print data
-        self.render('./costmanager/program.html', cost=data, user_basename=user_basename, program=group, one=one,
-                    two=two,
-                    projectname=projectname, groupname=groupname, projectid=projectid)
+        print 'insetrt %s' % str(tuple(id_list))
+        program_count = len(id_list)
+        self.render('./costmanager/program.html', user_basename=user_basename, program_count=program_count)
 
+
+class UserProgramListHandler(BaseHandler):
     @tornado.web.authenticated
-    def post(self):
+    def get(self):
         user_basename = self.current_user
         name = project_info()
         group = mysqlgroup(user_basename)
         id_list = dictkey(group, name)
-        projectname = filter_grouplist(id_list, name)
-        one = self.get_argument('one')
-        two = self.get_argument('two')
-        projectid = self.get_argument('three')
-        projectid = int(projectid)
-        groupname = name[int(projectid)]
-        # groupname = int(projectid)
-        data = project_cost(one, two, projectid)
-        print data
-        self.render('./costmanager/program.html', cost=data, user_basename=user_basename, program=group, one=one,
-                    two=two,
-                    projectname=projectname, groupname=groupname, projectid=projectid)
+        programid = str(tuple(id_list))
+        one, two = lastmonth_start_end()
+        sql = 'select a.projectId,b.projectName,a.money from (select * from server_costs where projectId in %s and date between %s and %s) as a left join project_info as b on a.projectId=b.projectid;' % (
+            programid, one, two)
+        data = mysqlselect(sql)
+        self.render('./costmanager/userprogramlist.html', costlist=data, user_basename=user_basename)
+
+
+
+
+
+
+
+
+        # @tornado.web.authenticated
+        # def get(self):
+        #     user_basename = self.current_user
+        #     name = project_info()
+        #     group = mysqlgroup(user_basename)
+        #     id_list = dictkey(group, name)
+        #     projectname = filter_grouplist(id_list, name)
+        #     one = '2016-01-01'
+        #     start, two = lastmonth_start_end()
+        #     projectid = id_list[0]
+        #     projectid = int(projectid)
+        #     groupname = name[int(projectid)]
+        #     # groupname = int(projectid)
+        #     data = project_cost(one, two, projectid)
+        #     print data
+        #     self.render('./costmanager/program.html', cost=data, user_basename=user_basename, program=group, one=one,
+        #                 two=two,
+        #                 projectname=projectname, groupname=groupname, projectid=projectid)
+        #
+        # @tornado.web.authenticated
+        # def post(self):
+        #     user_basename = self.current_user
+        #     name = project_info()
+        #     group = mysqlgroup(user_basename)
+        #     id_list = dictkey(group, name)
+        #     projectname = filter_grouplist(id_list, name)
+        #     one = self.get_argument('one')
+        #     two = self.get_argument('two')
+        #     projectid = self.get_argument('three')
+        #     projectid = int(projectid)
+        #     groupname = name[int(projectid)]
+        #     # groupname = int(projectid)
+        #     data = project_cost(one, two, projectid)
+        #     print data
+        #     self.render('./costmanager/program.html', cost=data, user_basename=user_basename, program=group, one=one,
+        #                 two=two,
+        #                 projectname=projectname, groupname=groupname, projectid=projectid)
 
 
 class QcloudUserHandler(BaseHandler):

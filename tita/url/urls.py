@@ -3,7 +3,8 @@ from handler.Admin import AdminIndexHandler, UserHandler, PasswordHandler, Usera
     GroupHandler, GroupdeleteHandler, UserdeleteHandler, GroupaddHandler, GroupdetailHandler, LogoutHandler
 from handler.CostManager import LoginHandler, BarHandler, LineHandler, LineprogramHandler, TableHandler, \
     InformationHandler, ProgramHandler, AllviewHandler, ProgramlistHandler, CostlistHandler, UserChangePasswordHandler, \
-    QcloudcostlistHandler, QcloudtableHandler, QcloudLineHandler, QcloudBarHandler, QcloudUserHandler
+    QcloudcostlistHandler, QcloudtableHandler, QcloudLineHandler, QcloudBarHandler, QcloudUserHandler, \
+    UserProgramListHandler
 
 urls = [
     (r"/", LoginHandler),
@@ -35,6 +36,12 @@ urls = [
     (r"/qcloudline/", QcloudLineHandler),
     (r"/qcloudbar/", QcloudBarHandler),
     (r"/qclouduser/", QcloudUserHandler),
+
+
+    #userProgram
+    (r"/userprogramlist/", UserProgramListHandler),
+
+
     # user password
     (r"/userchangepassword/", UserChangePasswordHandler),
     (r"/userchangepassword/([0-9]+)", UserChangePasswordHandler),

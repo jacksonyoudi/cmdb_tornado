@@ -1,116 +1,66 @@
-{% extends 'baseuser.html' %}
+{% extends "baseuser.html"  %}
 
-{%  block barcanv %}
-<script type='text/javascript'  charset="utf-8">
-    //定义数据
-  var data = {{cost}};
-   var program = "{{groupname}}";
-
-
-
-    $(function () {
-        var chart = new iChart.Column2D({
-            render: 'canvasDiv',//渲染的Dom目标,canvasDiv为Dom的ID
-            data: data,//绑定数据
-            // title : '项目费用',//设置标题
-            width: 1200,//设置宽度，默认单位为px
-            height: 600,//设置高度，默认单位为px
-            shadow: true,//激活阴影
-            animation: Boolean, //激活动画
-            column_width: 45,
-            tip: {
-                enable: true,
-                listeners: {
-                    //tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
-                    parseText: function (tip, name, value, text, i) {
-                        //将数字进行千位格式化
-                        var f = new String(value);
-                        f = f.split("").reverse().join("").replace(/(\d{3})/g, "$1,").split("").reverse();
-                        if (f[0] == ',') {
-                            f.shift();
-                        }
-                        f = f.join("");
-
-                        return name + "费用:<br/>" + f + "元";
-                    }
-                }
-            },
-            footnote: {
-                text: program,
-                color: "#000000",
-                fontsize: 18,
-                font: "微软雅黑",
-                textAlign: "center",
-                height: 30,
-                offsetx: -32,
-                offsety: 0
-            },
-            shadow_color: '#c7c7c7',//设置阴影颜色
-            coordinate: {//配置自定义坐标轴
-                scale: [{//配置自定义值轴
-                    position: 'left',//配置左值轴
-//                    start_scale: 0,//设置开始刻度为0
-//                    end_scale: 1000000,//设置结束刻度为26
-//                    scale_space: 100000,//设置刻度间距
-                      scale_share:7,
-                    listeners: {//配置事件
-                        parseText: function (t, x, y) {//设置解析值轴文本
-                            return {text: t}
-                        }
-                    }
-                }]
-            }
-        });
-
-        //利用自定义组件构造左侧说明文本
-        chart.plugin(new iChart.Custom({
-            drawFn: function () {
-                //计算位置
-                var coo = chart.getCoordinate(),
-                        x = coo.get('originx'),
-                        y = coo.get('originy');
-                //在左上侧的位置，渲染一个单位的文字
-                chart.target.textAlign('start')
-                        .textBaseline('bottom')
-                        .textFont('600 11px 微软雅黑')
-                        .fillText('费用(单位：元)', x - 40, y - 10, false, '#6d869f');
-
-            }
-        }));
-        //调用绘图方法开始绘图
-        chart.draw();
-    });
-
-</script>
-
+{% block barcanv %}
+<script src="/static/costmanager/js/inspinia.js"></script>
+<link href="/static/costmanager/css/style.css" rel="stylesheet">
+<script src='/static/costmanager/js/ichart.1.2.1.min.js'></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+<script src="/static/costmanager/laydate/laydate.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 {% end %}
 
 {% block body %}
-<div>
-    <form action="/program/" method="post" id="formid">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <select name="three" id="selectone" class="form-control input-small" style="width:200px;display: inline;">
-            <% request.setCharacterEncoding("utf-8");%>
-            {% for key,value in projectname.items() %}
-            {% if key == projectid %}
-            <option value={{ key }} selected="selected">{{ value }}</option>
-            {% else %}
-            <option value={{ key }}>{{ value }}</option>
-            {% end%}
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-success pull-right">Program</span>
+                    <h5>管理项目数</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/userprogramlist/">{{program_count}}</a></h1>
+                    <small>All Program</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-info pull-right">Cost</span>
+                    <h5>本月总费用</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/costlist/">month_cost</a></h1>
+                    <small>All fee</small>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-primary pull-right">last mon</span>
+                    <h5>腾讯云上月账单</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/qcloudcostlist/"> <span id="online_users">qcloudcost</span></a></h1>
 
-            {% end %}
-        </select>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="hello"
-                                                                                                   class="laydate-icon"
-                                                                                                   name="one" value={{
-                                                                                                   one }}>到<input
-            id="hello1" class="laydate-icon" name="two" value={{ two }}></input>&nbsp;
-        <button type="submit" class="btn btn-primary">提交</button>
-    </form>
-</div>
-<div id='canvasDiv' style="float: left"></div>
+                    <small>All fee</small>
+                </div>
+            </div>
+        </div>
 
-
-
-{% end %}
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-danger pull-right">last month</span>
+                    <h5>上月总费用</h5>
+                </div>
+                <div class="ibox-content">
+                        <h1 class="no-margins"><a href="/costlist/"> <span id="online_hosts">lastmonth_cost</span></a></h1>
+                    <small>ALL fee</small>
+                </div>
+            </div>
+        </div>
+{%  end %}

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>表格展示</title>
-  <script src="/static/laydate/laydate.js"></script>
   <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
   <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+  <script src="/static/costmanager/laydate/laydate.js"></script>
 </head>
 <body>
         <form action="/table/" method="post" id="formid">
@@ -160,5 +160,13 @@ laydate({
     event: 'focus' //响应事件。如果没有传入event，则按照默认的click
 
 });
+</script>
+
+
+<script>
+ $("#selectone").change(function(){
+      document.getElementById('formid').submit()
+
+ });
 </script>
 </html>
