@@ -509,7 +509,9 @@ class QcloudUserHandler(BaseHandler):
         print st
         sql = 'select id,programe_name,cvm_count,fee from cost_mon_program where programe_name in %s and mon_date between %s and %s;' % (
             st, start, two)
+        print sql
         data = mysqlselect(sql)
+        print data
         self.render('./costmanager/qclouduserlist.html', costlist=data, user_basename=user_basename)
 
 

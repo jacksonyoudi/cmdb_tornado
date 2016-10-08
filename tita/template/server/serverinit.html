@@ -1,0 +1,12 @@
+{% extends "../costmanager/base.html"  %}
+{% block context %}
+        <h1>请填写需要初始化的主机信息</h1>
+        <p class="welcome">请在下面填写需要初始化主机的<b>内网IP</b>，<b>主机名</b>，<b>密码（可选）</b>，字段之间以空白分隔，每台主机占用一行
+        <br>此初始化作业目前支持Ubuntu 12.x，CentOS 6.x，Debian 7.x的操作系统，其中密码一项是指用户root（CentOS，Debian）或是ubuntu（Ubuntu）的密码，当密码为缺省值<i>1234Qwer</i>时，可不用填写
+        </p>
+
+        <form method="post" action="/serverinit/">
+        <textarea name="package" rows="5" cols="60" placeholder="10.251.104.1  WEB-TEST"></textarea><br>
+        <input type="submit" value="Submit">
+        </form>
+{% end %}

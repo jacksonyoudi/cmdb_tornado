@@ -20,7 +20,7 @@ admin_passwd = "tornado"
 cmdb_db = {"host": cmdb_host, 'user': cmdb_user, 'db':cmdb_db, 'passwd': cmdb_passwd, 'port': cmdb_port}
 admin_db = {"host": admin_host, 'user': admin_user, 'db': admin_db, 'passwd': admin_passwd, 'port': admin_port}
 
-define("port", default=8090, help="run on the given port", type=int)
+define("port", default=80, help="run on the given port", type=int)
 define("mysql_host", default="127.0.0.1:3306", help="db host")
 define("mysql_database", default="tornado", help="db name")
 define("mysql_user", default="tornado", help="db user")

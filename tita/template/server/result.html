@@ -1,0 +1,55 @@
+{% extends "../costmanager/base.html" %}
+
+{% block context %}
+  <!-- div id="content" -->
+            <h2>You command is：</h2>
+            <p>{{SALTCOMMAND}}</p>
+            <h2>The result is：</h2>
+
+    <div class="ifr_div">
+  	<div class="proccess" id="loading">
+  		<p>
+  			<b>任务正在执行中，请等待...</b><br><br>
+                  	<img src="/static/server/img/loading.gif">
+  		</p>
+
+  	   <!--
+             <div class="cssload-container">
+             	<div class="cssload-progress cssload-float cssload-shadow">
+             		<div class="cssload-progress-item"></div>
+             	</div>
+             </div>
+  	   -->
+
+  	</div>
+
+        <!-- <iframe id="sfa" name="sfa" frameborder="0" scrolling="auto" height="600" width="600"></iframe> -->
+        <iframe id="sfa" name="sfa" frameborder="0" scrolling="auto" height="900" width="1200"></iframe>
+    </div>
+
+    <script language="JavaScript" >
+    var iframe = document.getElementById("sfa");
+
+    {% if SALTFUNCTION == 'cmd.run' %}
+       iframe.src = "/singleret/ret_cmd_run";
+    {% elif SALTFUNCTION == 'host.init' %}
+       iframe.src = "/pageret/ret_host_init";
+    {% elif SALTFUNCTION == 'state.sls' %}
+       iframe.src = "/singleret/ret_state_sls";
+    {% end %}
+
+    <!-- iframe.src = "/singleret/ret_state_sls"; -->
+    if (iframe.attachEvent){
+        iframe.attachEvent("onload", function(){
+        document.getElementById("loading").style.display="none";
+        });
+    } else {
+        iframe.onload = function(){
+        document.getElementById("loading").style.display="none";
+        };
+    }
+    </script>
+
+
+  <!-- /div -->
+{% end %}

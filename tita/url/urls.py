@@ -5,6 +5,7 @@ from handler.CostManager import LoginHandler, BarHandler, LineHandler, Lineprogr
     InformationHandler, ProgramHandler, AllviewHandler, ProgramlistHandler, CostlistHandler, UserChangePasswordHandler, \
     QcloudcostlistHandler, QcloudtableHandler, QcloudLineHandler, QcloudBarHandler, QcloudUserHandler, \
     UserProgramListHandler
+from handler.Server import ServerinitHandler
 
 urls = [
     (r"/", LoginHandler),
@@ -46,4 +47,8 @@ urls = [
     (r"/userchangepassword/", UserChangePasswordHandler),
     (r"/userchangepassword/([0-9]+)", UserChangePasswordHandler),
     # (r"/ip/", IpHandler),
+
+
+    #server ops
+    (r"/serverinit/", ServerinitHandler),
 ]
